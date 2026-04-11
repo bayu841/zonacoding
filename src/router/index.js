@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
-
+import ClasIndex from "../views/ClasIndex.vue";
 // Admin Views
 import AdminLayout from "../views/admin/Layout.vue";
 import AdminDashboard from "../views/admin/Dashboard.vue";
@@ -30,6 +30,11 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+  },
+  {
+    path: "/class",
+    name: "class",
+    component: ClasIndex,
   },
   {
     path: "/admin",
