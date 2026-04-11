@@ -46,8 +46,8 @@ import GlareHover from "../components/GlareHover.vue";
 
     </div>
 </GlareHover>
-        <GlareHover
-            clas="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
+ <GlareHover
+            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
             background="#ffffff"
             border-color="#e5e7eb"
             border-radius="12px"
@@ -59,7 +59,7 @@ import GlareHover from "../components/GlareHover.vue";
         <div class="p-7 text-start">
         
         <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
+        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
         <img src="../assets/images/html.png" alt="HTML Icon">
         </div>
 
