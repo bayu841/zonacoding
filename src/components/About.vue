@@ -32,22 +32,22 @@ onMounted(() => {
           <img 
             src="../assets/images/logo.png"
             alt="About Image"
-            class="w-full max-w-sm"
+            class="w-80"
           />
         </div>
 
       <!-- TEXT -->
       <div>
         <p class="font-bold text-blue-500 py-2 font-medium">Tentang Kami</p>
-        <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
+        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-6 font-poppins">
           Apa Itu NextSkill ?
         </h1>
 
-        <p class="text-base text-gray-600 mb-4">
+        <p class="text-gray-600 mb-4">
           Kami adalah platform pembelajaran online yang membantu kamu belajar coding dengan cara yang lebih mudah, cepat, dan menyenangkan.
         </p>
 
-        <p class="text-base text-gray-600 mb-6">
+        <p class="text-gray-600 mb-6">
           Dengan materi yang terstruktur, mentor berpengalaman, dan project nyata, kamu bisa meningkatkan skill dan siap masuk dunia kerja.
         </p>
       </div>

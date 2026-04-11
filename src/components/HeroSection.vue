@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 
 // FULL TEXT (gabung semua)
-const fullText = "Belajar Coding Lebih Mudah di NextSkill";
+const fullText = "Belajar  Lebih Mudah di NextSkill";
 
 const typedText = ref("");
 let index = 0;
@@ -43,9 +43,9 @@ const highlightText = computed(() => {
     
     <!-- KIRI (TEXT) -->
     <div class="md:w-1/2 text-center md:text-left px-12 py-3">
-      <h1 class="font-poppins text-4xl md:text-5xl font-bold leading-tight text-gray-900 gap-3">
+      <h1 class="font-poppins text-4xl md:text-5xl font-bold leading-tight text-gray-800 gap-3">
             {{ beforeText }}
-          <span class="text-blue-600">{{ highlightText }}</span>
+          <span class="text-blue-500">{{ highlightText }}</span>
       </h1>
 
       <p class="mt-4 text-gray-600 text-lg">
