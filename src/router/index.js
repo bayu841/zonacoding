@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import ClasIndex from "../views/ClasIndex.vue";
 import Faq from "../views/Faq.vue";
 import News from "../views/News.vue";
+import ErrorView from "../views/ErrorView.vue";
 
 import LoginView from "../components/auth/LoginView.vue";
 import RegisterView from "../components/auth/RegisterView.vue";
@@ -247,6 +248,28 @@ const routes = [
         component: StudentSettings,
       },
     ],
+  },
+  {
+    path: "/403",
+    name: "Forbidden",
+    component: ErrorView,
+    props: { code: 403 }
+  },
+  {
+    path: "/404",
+    name: "NotFound",
+    component: ErrorView,
+    props: { code: 404 }
+  },
+  {
+    path: "/500",
+    name: "ServerError",
+    component: ErrorView,
+    props: { code: 500 }
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/404"
   },
 ];
 
