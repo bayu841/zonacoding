@@ -87,7 +87,6 @@ import { BookOpen, Zap, Target, Code2, LineChart, Award } from "lucide-vue-next"
       </div>
 
     </div>
-  </div>
 </section>
   <img src="../assets/images/pattern7.webp" alt="" class="w-[100px] float mb-2 ml-3 ">
 </template>
