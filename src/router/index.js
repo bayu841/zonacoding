@@ -3,6 +3,10 @@ import Home from "../views/Home.vue";
 import ClasIndex from "../views/ClasIndex.vue";
 import Faq from "../views/Faq.vue";
 import News from "../views/News.vue";
+
+import LoginView from "../components/auth/LoginView.vue";
+import RegisterView from "../components/auth/RegisterView.vue";
+
 // Admin Views
 import AdminLayout from "../views/admin/Layout.vue";
 import AdminDashboard from "../views/admin/Dashboard.vue";
@@ -78,6 +82,21 @@ const routes = [
     path: "/faq",
     name: "faq",
     component: Faq,
+  },
+  {
+    path: "/news",
+    name: "news",
+    component: News,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: LoginView,
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: RegisterView,
   },
   {
     path: "/news",

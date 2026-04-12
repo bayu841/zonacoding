@@ -38,9 +38,11 @@ const isOpen = ref(false);
         </router-link>
       </li>
       </ul>
-        <button class="hidden md:block text-white px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:to-blue-400 font-semibold">
+    <router-link
+      to="/login"
+      class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 font-semibold inline-block text-center">
       Login
-    </button>
+    </router-link>
 
       <!-- Hamburger Button -->
       <button 
@@ -77,9 +79,11 @@ const isOpen = ref(false);
           FAQ
         </router-link>
       </li>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 font-semibold">
+    <router-link
+      to="/login"
+      class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 font-semibold inline-block text-center">
       Login
-     </button>
+    </router-link>
       </ul>
     </div>
   </nav>
