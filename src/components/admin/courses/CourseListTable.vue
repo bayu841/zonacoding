@@ -1,16 +1,16 @@
 <script setup>
-import { Edit, Trash2, Eye, User, Tag, Calendar, Layout } from 'lucide-vue-next'
+import { Edit, Trash2, Eye, User, Tag, Calendar, Layout, CheckCircle, XCircle } from 'lucide-vue-next'
 
 defineProps({
   courses: Array
 })
 
-defineEmits(['view-detail', 'view-edit', 'delete-course'])
+defineEmits(['view-detail', 'view-edit', 'delete-course', 'approve-course', 'reject-course'])
 
 const getStatusClass = (status) => {
-  return status === 'Published'
-    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-    : 'bg-amber-50 text-amber-700 border-amber-200'
+  if (status === 'Published') return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+  if (status === 'Pending') return 'bg-amber-100 text-amber-700 border-amber-300 shadow-sm animate-pulse'
+  return 'bg-gray-100 text-gray-700 border-gray-200'
 }
 
 const getCategoryClass = (category) => {
@@ -71,6 +71,12 @@ const getCategoryClass = (category) => {
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div class="flex items-center justify-end gap-1">
+                <button v-if="course.status === 'Pending'" @click="$emit('approve-course', course)" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-all" title="Setujui">
+                  <CheckCircle class="w-4 h-4" />
+                </button>
+                <button v-if="course.status === 'Pending'" @click="$emit('reject-course', course)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Tolak">
+                  <XCircle class="w-4 h-4" />
+                </button>
                 <button @click="$emit('view-edit', course)" class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Edit">
                   <Edit class="w-4 h-4" />
                 </button>

@@ -1,53 +1,45 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   LayoutDashboard,
-  Users,
+  Compass,
   BookOpen,
-  GraduationCap,
-  Receipt,
-  Settings,
+  Award,
   Trophy,
-  Tags,
+  Settings,
   Menu,
   LogOut,
-  X,
-  CheckSquare
+  X
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 
-// State untuk sidebar desktop (expanded/collapsed)
+// State 
 const isSidebarOpen = ref(true)
-
-// State untuk mobile drawer (terbuka/tertutup)
 const isMobileDrawerOpen = ref(false)
 
 const navigationGroups = [
   {
     title: 'Utama',
     items: [
-      { name: 'Dashboard', to: '/admin', icon: LayoutDashboard, exact: true },
-      { name: 'Papan Peringkat', to: '/admin/leaderboard', icon: Trophy }
+      { name: 'Dashboard', to: '/student', icon: LayoutDashboard, exact: true },
+      { name: 'Papan Peringkat', to: '/student/leaderboard', icon: Trophy }
     ]
   },
   {
-    title: 'Akademik',
+    title: 'Pembelajaran',
     items: [
-      { name: 'Persetujuan Kursus', to: '/admin/courses/approvals', icon: CheckSquare },
-      { name: 'Kategori Kursus', to: '/admin/categories', icon: Tags },
-      { name: 'Manajemen Kursus', to: '/admin/courses', icon: BookOpen },
-      { name: 'Manajemen Mentor', to: '/admin/mentors', icon: GraduationCap },
-      { name: 'Manajemen Pengguna', to: '/admin/users', icon: Users }
+      { name: 'Eksplorasi Kursus', to: '/student/explore', icon: Compass },
+      { name: 'Kursus Saya', to: '/student/courses', icon: BookOpen }
     ]
   },
   {
-    title: 'Sistem',
+    title: 'Pencapaian & Akun',
     items: [
-      { name: 'Transaksi', to: '/admin/transactions', icon: Receipt },
-      { name: 'Pengaturan', to: '/admin/settings', icon: Settings }
+      { name: 'Sertifikat', to: '/student/certificates', icon: Award },
+      { name: 'Pengaturan', to: '/student/settings', icon: Settings }
     ]
   }
 ]
@@ -72,27 +64,11 @@ const handleLogout = () => {
   router.push('/')
 }
 
-// Helper untuk mengecek apakah route saat ini aktif (termasuk nested)
 const isActiveRoute = (item) => {
   if (item.exact) {
     return route.path === item.to
   }
-  
-  // Jika path saat ini diawali dengan item.to
-  if (route.path.startsWith(item.to)) {
-    // Cari apakah ada item navigasi lain yang lebih spesifik (lebih panjang) yang juga cocok
-    const allItems = navigationGroups.flatMap(g => g.items)
-    const hasBetterMatch = allItems.some(other => 
-      other.to !== item.to && 
-      other.to.startsWith(item.to) && 
-      route.path.startsWith(other.to)
-    )
-    
-    // Aktifkan hanya jika tidak ada match yang lebih mendalam
-    return !hasBetterMatch
-  }
-  
-  return false
+  return route.path.startsWith(item.to)
 }
 </script>
 
@@ -118,19 +94,19 @@ const isActiveRoute = (item) => {
       <!-- Header Sidebar -->
       <div class="h-16 flex items-center justify-between px-5 border-b border-gray-200/60">
         <h1
-          class="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent transition-all"
+          class="font-extrabold text-xl bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent transition-all"
           :class="{ 'md:hidden': !isSidebarOpen }"
         >
-          NextSkill Admin
+          NextSkill
         </h1>
-        <h1 class="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent hidden" :class="{ 'md:block': !isSidebarOpen }">
+        <h1 class="font-extrabold text-xl bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent hidden" :class="{ 'md:block': !isSidebarOpen }">
           NS
         </h1>
 
         <!-- Tombol close di mobile -->
         <button
           @click="closeMobileDrawer"
-          class="p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all md:hidden"
+          class="p-2 rounded-xl text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all md:hidden"
         >
           <X class="w-5 h-5" />
         </button>
@@ -138,24 +114,24 @@ const isActiveRoute = (item) => {
 
       <nav class="flex-1 overflow-y-auto py-6 px-3 custom-scrollbar">
         <div v-for="(group, gIdx) in navigationGroups" :key="gIdx" class="mb-6 last:mb-0">
-          <h3 class="px-4 text-[11px] font-extrabold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2" :class="{ 'md:hidden': !isSidebarOpen }">
+          <h3 class="px-4 text-[11px] font-extrabold text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2" :class="{ 'md:hidden': !isSidebarOpen }">
             {{ group.title }}
           </h3>
           <div class="h-4 w-full flex items-center justify-center mb-3 hidden" :class="{ 'md:flex': !isSidebarOpen }">
             <div class="w-1 h-1 rounded-full bg-gray-300"></div>
           </div>
-
+          
           <ul class="space-y-1.5">
             <li v-for="item in group.items" :key="item.name">
               <router-link
                 :to="item.to"
                 :title="!isSidebarOpen ? item.name : ''"
                 @click="closeMobileDrawer"
-                class="flex items-center px-4 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50/80 hover:text-blue-600 transition-all duration-200 group"
+                class="flex items-center px-4 py-2.5 rounded-xl text-gray-600 hover:bg-indigo-50/80 hover:text-indigo-600 transition-all duration-200 group"
                 :class="[
                   { 'md:justify-center': !isSidebarOpen },
                   isActiveRoute(item)
-                    ? 'bg-blue-50 text-blue-700 font-medium shadow-[0_2px_8px_rgba(59,130,246,0.08)]'
+                    ? 'bg-indigo-50 text-indigo-700 font-medium shadow-[0_2px_8px_rgba(79,70,229,0.08)]'
                     : ''
                 ]"
               >
@@ -182,7 +158,7 @@ const isActiveRoute = (item) => {
         <div class="flex items-center">
           <!-- Tombol untuk mobile drawer -->
           <button
-            class="p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all mr-1 md:hidden"
+            class="p-2 rounded-xl text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all mr-1 md:hidden"
             @click="toggleMobileDrawer"
           >
             <Menu class="w-5 h-5" />
@@ -190,15 +166,16 @@ const isActiveRoute = (item) => {
 
           <!-- Tombol collapse/expand untuk desktop -->
           <button
-            class="p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all hidden md:block"
+            class="p-2 rounded-xl text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all hidden md:block"
             @click="isSidebarOpen = !isSidebarOpen"
           >
             <Menu class="w-5 h-5" />
           </button>
 
           <!-- Page title / breadcrumb -->
-          <div class="ml-3 sm:ml-5 font-medium text-gray-700 text-[15px]">
-            Dashboard
+          <div class="ml-3 sm:ml-5 font-medium text-gray-700 text-[15px] flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+            Area Siswa
           </div>
         </div>
 
@@ -209,9 +186,13 @@ const isActiveRoute = (item) => {
             class="flex items-center gap-2 focus:outline-none group"
           >
             <div
-              class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-semibold text-sm shadow-[0_2px_8px_rgba(59,130,246,0.2)] ring-2 ring-white/80 group-hover:ring-blue-200 transition-all"
+              class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(79,70,229,0.3)] ring-2 ring-white/80 group-hover:ring-indigo-200 transition-all"
             >
-              A
+              U
+            </div>
+            <div class="hidden sm:block text-left ml-1">
+              <p class="text-sm font-semibold text-gray-700 leading-tight">Student User</p>
+              <p class="text-xs text-indigo-600 font-medium">Level 12</p>
             </div>
           </button>
 

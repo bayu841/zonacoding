@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Check, ChevronRight, ChevronLeft, Save, Layout, BookOpen, Settings } from 'lucide-vue-next'
+import { Check, ChevronRight, ChevronLeft, Save, Layout, BookOpen, Settings, Plus } from 'lucide-vue-next'
 
 const props = defineProps({
   initialData: {
@@ -155,16 +155,50 @@ const submitForm = () => {
           </div>
 
           <div class="space-y-4">
-              <div v-for="(module, index) in form.modules" :key="index" class="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
-                 <label class="block text-xs font-bold text-indigo-500 uppercase tracking-widest mb-2">Modul {{ index + 1 }}</label>
+              <div v-for="(module, mIdx) in form.modules" :key="mIdx" class="p-6 border border-gray-100 rounded-2xl bg-white shadow-sm space-y-4">
+                 <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Modul {{ mIdx + 1 }}</label>
+                    <button @click="form.modules.splice(mIdx, 1)" class="text-gray-300 hover:text-red-500 transition-colors">
+                       <Plus class="w-4 h-4 rotate-45" />
+                    </button>
+                 </div>
                  <input 
                   v-model="module.title" 
                   type="text" 
                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all font-semibold" 
                   placeholder="Masukkan judul modul..." 
                  />
+
+                 <!-- Lessons in Admin Form -->
+                 <div class="space-y-3 mt-4 pl-4 border-l-2 border-gray-100">
+                    <div v-for="(lesson, lIdx) in module.lessons" :key="lIdx" class="space-y-2">
+                       <div class="flex items-center gap-3 bg-gray-50/50 p-2 rounded-xl border border-gray-100">
+                          <select v-model="lesson.type" class="text-[10px] font-black uppercase text-indigo-500 bg-white border border-gray-100 rounded-lg px-2 py-1 outline-none">
+                             <option value="video">VIDEO</option>
+                             <option value="text">TEKS</option>
+                             <option value="project">TUGAS</option>
+                          </select>
+                          <input v-model="lesson.title" type="text" placeholder="Judul Materi" class="flex-1 bg-transparent border-none text-xs font-bold text-gray-700 focus:ring-0 p-0" />
+                          <button @click="module.lessons.splice(lIdx, 1)" class="text-gray-300 hover:text-red-500 transition-colors">
+                             <Plus class="w-3.5 h-3.5 rotate-45" />
+                          </button>
+                       </div>
+
+                       <!-- Project Extra Fields -->
+                       <div v-if="lesson.type === 'project'" class="ml-4 p-3 bg-indigo-50/30 rounded-xl border border-indigo-100/50 space-y-3">
+                          <div class="flex items-center gap-4">
+                             <label class="text-[10px] font-bold text-gray-500 uppercase">Deadline (Hari)</label>
+                             <input v-model="lesson.deadline" type="number" class="w-16 bg-white border border-gray-100 rounded-lg px-2 py-1 text-[10px] font-black" />
+                          </div>
+                          <textarea v-model="lesson.instructions" placeholder="Instruksi Tugas..." class="w-full bg-white border border-gray-100 rounded-lg p-2 text-[10px] font-medium resize-none"></textarea>
+                       </div>
+                    </div>
+                    <button @click="module.lessons.push({ title: '', type: 'video', deadline: 7, instructions: '' })" class="text-[10px] font-black text-indigo-500 uppercase flex items-center gap-1.5 hover:text-indigo-700 transition-colors">
+                       <Plus class="w-3.5 h-3.5" /> Tambah Materi
+                    </button>
+                 </div>
               </div>
-              <button class="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50 transition-all font-bold text-sm flex items-center justify-center gap-2">
+              <button @click="form.modules.push({ title: '', lessons: [{ title: '', type: 'video', deadline: 7, instructions: '' }] })" class="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50 transition-all font-bold text-sm flex items-center justify-center gap-2">
                  <Plus class="w-4 h-4" />
                  Tambah Modul Baru
               </button>
