@@ -5,7 +5,7 @@ import { BookOpen, Zap, Target, Code2, LineChart, Award } from "lucide-vue-next"
 <template>
   <!-- PATTERN TOP -->
   <div class="flex justify-end">
-    <img src="../assets/images/pattern6.png" alt="" class="w-[180px]" />
+  <img src="../assets/images/pattern6.webp" alt="" class="w-[180px] ">
   </div>
 
   <section class="text-center px-6 mb-16">
@@ -87,8 +87,7 @@ import { BookOpen, Zap, Target, Code2, LineChart, Award } from "lucide-vue-next"
       </div>
 
     </div>
-  </section>
-
-  <!-- PATTERN BOTTOM -->
-  <img src="../assets/images/pattern7.png" alt="" class="w-[100px] float mb-2 ml-3" />
+  </div>
+</section>
+  <img src="../assets/images/pattern7.webp" alt="" class="w-[100px] float mb-2 ml-3 ">
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <section class="py-16 bg-[url('/src/assets/images/testimoni.png')] bg-cover bg-center p-5 md:p-20 mt-5">
+  <section class="py-16 bg-[url('/src/assets/images/testimoni.webp')] bg-cover bg-center p-5 md:p-20 mt-5">
     
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
       

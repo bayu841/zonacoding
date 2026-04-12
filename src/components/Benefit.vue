@@ -3,7 +3,7 @@
 
 <template>
   <div class="flex justify-end">
-  <img src="../assets/images/pattern4.png" alt="" class="w-16 mr-20 mt-10 spin">
+  <img src="../assets/images/pattern4.webp" alt="" class="w-16 mr-20 mt-10 spin">
   </div>
   <section 
     class="px-4 md:px-6 transition-all duration-500 mb-10"
@@ -13,7 +13,7 @@
       <!-- IMAGE -->
       <div class="flex justify-center order-1 md:order-none">
         <img 
-          src="../assets/images/classhero.png"
+          src="../assets/images/classhero.webp"
           alt="About Image"
           class="w-full max-w-xs sm:max-w-sm md:max-w-sm float"
         />
@@ -58,5 +58,5 @@
       </div>
     </div>
   </section>
-  <img src="../assets/images/pattern5.png" alt="" class="w-16 ml-20 float">
+  <img src="../assets/images/pattern5.webp" alt="" class="w-16 ml-20 float">
 </template>

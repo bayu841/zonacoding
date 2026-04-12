@@ -74,7 +74,7 @@ const highlightText = computed(() => {
       <!-- KANAN (IMAGE) -->
       <div class="md:w-1/2">
         <img 
-          src="/src/assets/images/hero.png" 
+          src="/src/assets/images/hero.webp" 
           alt="Hero Image"
           class="w-60 sm:w-80 md:w-full max-w-md mx-auto transition-all duration-700 ease-out"
           :class="showImage 
@@ -84,5 +84,5 @@ const highlightText = computed(() => {
       </div>
     </div>
   </section>
-  <img src="../assets/images/pattern2.png" alt="" class="w-[200px] rotate-12">
+  <img src="../assets/images/pattern2.webp" alt="" class="w-[200px] rotate-12">
 </template>

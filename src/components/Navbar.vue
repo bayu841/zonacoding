@@ -9,7 +9,7 @@ const isOpen = ref(false);
     <div class="flex justify-between items-center px-6 py-4">
 
       <!-- Logo -->
-    <img src="../assets/images/logo.png" alt=""
+    <img src="../assets/images/logo.webp" alt=""
     class="w-10">
 
       <!-- Menu Desktop -->

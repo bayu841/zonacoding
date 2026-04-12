@@ -5,9 +5,9 @@ import GlareHover from "../components/GlareHover.vue";
 
 <template>
     <div class="flex justify-end mr-2">
-      <img src="../assets/images/pattern3.png" alt="" class="w-[210px] rotate-12">
+      <img src="../assets/images/pattern3.webp" alt="" class="w-[210px] rotate-12">
       </div>
-  <section class="text-center py-16 bg-[url('/src/assets/images/clasbg.jpg')] bg-cover bg-center">
+  <section class="text-center py-16 bg-[url('/src/assets/images/clasbg.webp')] bg-cover bg-center">
     <ShinyText
       text="Jelajahi Kelas Teratas"
       color="#3f58ee"
@@ -29,7 +29,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -63,7 +63,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -97,7 +97,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -131,7 +131,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -165,7 +165,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -199,7 +199,7 @@ import GlareHover from "../components/GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.png" alt="HTML Icon">
+        <img src="../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->

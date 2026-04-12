@@ -34,7 +34,7 @@ onMounted(() => {
         :class="isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'"
       >
         <img 
-          src="../assets/images/logo.png"
+          src="../assets/images/logo.webp"
           alt="About Image"
           class="w-40 sm:w-56 md:w-80"
         />
@@ -49,7 +49,7 @@ onMounted(() => {
           <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 font-poppins">
             Apa Itu NextSkill ?
           </h1>
-          <img src="../assets/images/pattern1.png" alt="" class="w-[69px] float">
+          <img src="../assets/images/pattern1.webp" alt="" class="w-[69px] float">
        </div>
         <p class="text-gray-600 mb-4">
           Kami adalah platform pembelajaran online yang membantu kamu belajar coding dengan cara yang lebih mudah, cepat, dan menyenangkan.
