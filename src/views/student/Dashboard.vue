@@ -1,11 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import {
-  Trophy,
-  Flame,
-  Clock,
   BookOpen,
-  ArrowRight
+  ArrowRight,
+  HelpCircle
 } from 'lucide-vue-next'
 import StatCard from '../../components/student/StatCard.vue'
 import RecentCourseCard from '../../components/student/RecentCourseCard.vue'
@@ -44,6 +42,26 @@ const recentCourses = ref([
           <p class="text-white text-3xl font-black tracking-tight">{{ totalXP }}</p>
         </div>
       </div>
+    </div>
+
+    <!-- Quiz Alert (Discoverability Improvement) -->
+    <div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
+          <HelpCircle class="w-6 h-6" />
+        </div>
+        <div>
+          <h3 class="font-bold text-amber-900 text-lg">Kamu punya Kuis yang belum selesai!</h3>
+          <p class="text-amber-700 text-sm">Selesaikan kuis di kursus "Fullstack Laravel & Vue" untuk melanjutkan.</p>
+        </div>
+      </div>
+      <router-link 
+        to="/student/courses/1/learn" 
+        class="w-full sm:w-auto px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-2xl shadow-lg shadow-amber-200 transition-all flex items-center justify-center gap-2"
+      >
+        Mulai Kerjakan
+        <ArrowRight class="w-5 h-5" />
+      </router-link>
     </div>
 
     <!-- Stats Grid -->

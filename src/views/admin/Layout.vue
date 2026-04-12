@@ -13,7 +13,7 @@ import {
   Menu,
   LogOut,
   X,
-  CheckSquare
+  UserCheck
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -36,7 +36,6 @@ const navigationGroups = [
   {
     title: 'Akademik',
     items: [
-      { name: 'Persetujuan Kursus', to: '/admin/courses/approvals', icon: CheckSquare },
       { name: 'Kategori Kursus', to: '/admin/categories', icon: Tags },
       { name: 'Manajemen Kursus', to: '/admin/courses', icon: BookOpen },
       { name: 'Manajemen Mentor', to: '/admin/mentors', icon: GraduationCap },

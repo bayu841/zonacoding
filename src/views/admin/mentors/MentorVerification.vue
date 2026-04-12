@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { ArrowLeft, Clock, ExternalLink, ThumbsUp, ThumbsDown, UserPlus, Mail, FileText } from 'lucide-vue-next'
+import { ArrowLeft, Clock, ExternalLink, UserCheck, XCircle, UserPlus, Mail, FileText } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import BaseModal from '../../../components/shared/BaseModal.vue'
 
 const router = useRouter()
 
@@ -10,14 +11,35 @@ const pendingMentors = ref([
   { id: 102, name: 'Lina Ayu', email: 'lina@example.com', portfolioLink: 'https://dribbble.com/lina', reason: 'Fokus pada materi UI/UX Design dasar dengan pendekatan studi kasus industri riil.', date: 'Kemarin' },
 ])
 
+// Modal State
+const modalState = ref({
+  isOpen: false,
+  title: '',
+  message: '',
+  type: 'info'
+})
+
+const closeModal = () => {
+  modalState.value.isOpen = false
+}
+
+const showModal = (title, message, type = 'info') => {
+  modalState.value = {
+    isOpen: true,
+    title,
+    message,
+    type
+  }
+}
+
 const approve = (id) => {
     pendingMentors.value = pendingMentors.value.filter(m => m.id !== id)
-    alert('Mentor disetujui!')
+    showModal('Berhasil!', 'Mentor telah berhasil disetujui.', 'success')
 }
 
 const reject = (id) => {
     pendingMentors.value = pendingMentors.value.filter(m => m.id !== id)
-    alert('Verifikasi Mentor ditolak.')
+    showModal('Verifikasi Ditolak', 'Permintaan verifikasi mentor telah ditolak.', 'warning')
 }
 </script>
 
@@ -103,15 +125,15 @@ const reject = (id) => {
             @click="reject(mentor.id)" 
             class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-sm text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all active:scale-95"
           >
-            <ThumbsDown class="w-4 h-4" />
+            <XCircle class="w-4 h-4" />
             Tolak
           </button>
           <button 
             @click="approve(mentor.id)" 
-            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95"
           >
-            <ThumbsUp class="w-4 h-4" />
-            Setujui
+            <UserCheck class="w-4 h-4" />
+            Verifikasi
           </button>
         </div>
       </div>
@@ -131,5 +153,16 @@ const reject = (id) => {
         </button>
       </div>
     </div>
+
+    <!-- Notification Modal -->
+    <BaseModal
+      :is-open="modalState.isOpen"
+      :title="modalState.title"
+      :message="modalState.message"
+      :type="modalState.type"
+      confirm-text="Siap"
+      @close="closeModal"
+      @confirm="closeModal"
+    />
   </div>
 </template>

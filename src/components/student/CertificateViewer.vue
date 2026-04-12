@@ -11,23 +11,23 @@ const emit = defineEmits(['close', 'download'])
 </script>
 
 <template>
-  <BaseModal 
+  <BaseModal
     :is-open="isOpen"
     @close="emit('close')"
     title="Pratinjau Sertifikat"
     size="5xl"
   >
     <div v-if="cert" class="w-full h-full flex flex-col items-center justify-center relative p-2 md:p-8">
-      
+
       <!-- Certificate Body -->
       <div class="w-full aspect-[4/3] relative bg-[#fafafa] rounded-sm shadow-xl flex flex-col items-center justify-center overflow-hidden border-[12px] border-[#cbd5e1] outline outline-4 outline-slate-300/50 outline-offset-4 mb-8">
-        
+
         <!-- Corner decorations -->
         <div class="absolute top-0 left-0 w-32 h-32 border-t-8 border-l-8 border-indigo-700 m-6 opacity-80"></div>
         <div class="absolute top-0 right-0 w-32 h-32 border-t-8 border-r-8 border-indigo-700 m-6 opacity-80"></div>
         <div class="absolute bottom-0 left-0 w-32 h-32 border-b-8 border-l-8 border-indigo-700 m-6 opacity-80"></div>
         <div class="absolute bottom-0 right-0 w-32 h-32 border-b-8 border-r-8 border-indigo-700 m-6 opacity-80"></div>
-        
+
         <!-- Watermark Background -->
         <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
           <Award class="w-[500px] h-[500px]" />
@@ -39,7 +39,7 @@ const emit = defineEmits(['close', 'download'])
         <p class="font-serif text-4xl md:text-6xl text-indigo-700 italic border-b-2 border-indigo-200/50 px-16 pb-2 mb-8 relative z-10">Student User</p>
         <p class="text-sm md:text-base text-gray-500 mb-2 relative z-10">Atas kelulusannya dalam menyelesaikan kelas</p>
         <h2 class="font-bold text-2xl md:text-3xl text-gray-900 mb-16 max-w-2xl text-center relative z-10">{{ cert.title }}</h2>
-        
+
         <!-- Footer Signatures -->
         <div class="absolute bottom-16 flex justify-between w-full px-24 items-end z-10">
           <div class="text-center">
@@ -54,7 +54,7 @@ const emit = defineEmits(['close', 'download'])
             <p class="text-[10px] uppercase tracking-widest font-bold text-gray-500">Chief Executive Officer</p>
           </div>
         </div>
-        
+
       </div>
 
       <!-- Custom Buttons -->
@@ -64,7 +64,7 @@ const emit = defineEmits(['close', 'download'])
           <DownloadCloud class="w-5 h-5 mr-3" /> Unduh PDF Resolusi Tinggi
         </button>
       </div>
-      
+
     </div>
   </BaseModal>
 </template>

@@ -1,5 +1,5 @@
 <script setup>
-import { CheckCircle, BookMarked } from 'lucide-vue-next'
+import { CheckCircle, BookMarked, Upload, HelpCircle } from 'lucide-vue-next'
 
 defineProps({
   courses: {
@@ -25,6 +25,24 @@ defineProps({
               <CheckCircle class="w-4 h-4" />
             </div>
             <span class="text-sm font-medium text-gray-700">{{ course.students }} Siswa Aktif</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-emerald-200/50">
+            <router-link 
+              :to="`/mentor/courses/${course.id}/upload-material`"
+              class="flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-xl text-xs font-bold transition-all hover:shadow-sm"
+            >
+              <Upload class="w-3.5 h-3.5" />
+              Upload Materi
+            </router-link>
+            <router-link 
+              :to="`/mentor/courses/${course.id}/upload-quiz`"
+              class="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-200"
+            >
+              <HelpCircle class="w-3.5 h-3.5" />
+              Upload Quiz
+            </router-link>
           </div>
         </div>
       </div>

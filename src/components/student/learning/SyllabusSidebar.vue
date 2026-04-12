@@ -6,7 +6,9 @@ import {
   Lock, 
   PlayCircle, 
   FileText, 
-  Award 
+  Award,
+  HelpCircle,
+  Download
 } from 'lucide-vue-next'
 
 defineProps({
@@ -70,7 +72,9 @@ const emit = defineEmits(['select-lesson', 'toggle-module'])
                 <PlayCircle v-if="lesson.type === 'video'" class="w-3.5 h-3.5" />
                 <FileText v-else-if="lesson.type === 'text'" class="w-3.5 h-3.5" />
                 <Award v-else-if="lesson.type === 'project'" class="w-3.5 h-3.5" />
-                <span>{{ lesson.type === 'video' ? lesson.duration : (lesson.type === 'text' ? lesson.readTime : 'Submission') }}</span>
+                <HelpCircle v-else-if="lesson.type === 'quiz'" class="w-3.5 h-3.5" />
+                <Download v-else-if="lesson.type === 'file'" class="w-3.5 h-3.5" />
+                <span>{{ lesson.type === 'video' ? lesson.duration : (lesson.type === 'text' ? lesson.readTime : (lesson.type === 'quiz' ? 'Quiz' : (lesson.type === 'file' ? 'Download' : 'Submission'))) }}</span>
                 <span v-if="checkLessonLocked(lesson.id)" class="ml-auto text-[9px] font-black text-gray-300 uppercase italic">Locked</span>
               </div>
             </div>

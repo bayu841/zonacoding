@@ -15,11 +15,13 @@ import {
   Send,
   UploadCloud,
   ExternalLink,
-  Award,
-  Lock,
-  Unlock,
-  AlertTriangle,
-  Calendar
+  Award, 
+  Lock, 
+  Unlock, 
+  AlertTriangle, 
+  Calendar,
+  ChevronRight,
+  HelpCircle
 } from 'lucide-vue-next'
 import BaseModal from '../../components/shared/BaseModal.vue'
 import { useAlert } from '../../composables/useAlert'
@@ -30,6 +32,8 @@ import TextLesson from '../../components/student/learning/TextLesson.vue'
 import ProjectSubmission from '../../components/student/learning/ProjectSubmission.vue'
 import SyllabusSidebar from '../../components/student/learning/SyllabusSidebar.vue'
 import DiscussionDrawer from '../../components/student/learning/DiscussionDrawer.vue'
+import QuizLesson from '../../components/student/learning/QuizLesson.vue'
+import FileLesson from '../../components/student/learning/FileLesson.vue'
 
 const { showAlert } = useAlert()
 const router = useRouter()
@@ -71,6 +75,39 @@ const syllabus = ref([
     lessons: [
       { id: 'l1', title: 'Apa itu Web Development?', type: 'video', duration: '12:40', isCompleted: true },
       { id: 'l2', title: 'Persiapan Tools & Instalasi', type: 'text', readTime: '5 min read', isCompleted: true },
+      { 
+        id: 'q1', 
+        title: 'Kuis Basic Web', 
+        type: 'quiz', 
+        isCompleted: false,
+        quizData: [
+          {
+            type: 'multiple-choice',
+            text: 'Apa kepanjangan dari HTML?',
+            options: ['Hyper Text Markup Language', 'High Tech Modern Language', 'Hyperlink Text Management List', 'Home Tool Markup Level'],
+            correctIndex: 0
+          },
+          {
+            type: 'matching',
+            text: 'Pasangkanlah istilah web berikut dengan fungsinya.',
+            leftItems: [
+              { id: 'l1', text: 'HTML' },
+              { id: 'l2', text: 'CSS' },
+              { id: 'l3', text: 'JavaScript' }
+            ],
+            rightItems: [
+              { id: 'r1', text: 'Kerangka Dasar (Structure)' },
+              { id: 'r2', text: 'Tampilan & Gaya (Presentative)' },
+              { id: 'r3', text: 'Logika Interaktif (Behavior)' }
+            ],
+            pairs: {
+              'l1': 'r1',
+              'l2': 'r2',
+              'l3': 'r3'
+            }
+          }
+        ]
+      },
     ]
   },
   {
@@ -80,6 +117,15 @@ const syllabus = ref([
     lessons: [
       { id: 'l3', title: 'Mengenal DOM & Struktur HTML', type: 'video', duration: '24:15', isCompleted: false },
       { id: 'l4', title: 'Styling dengan CSS Modern', type: 'text', readTime: '8 min read', isCompleted: false },
+      { 
+        id: 'f1', 
+        title: 'Cheat Sheet JavaScript ES6+', 
+        type: 'file', 
+        fileName: 'js-es6-cheatsheet.pdf', 
+        fileType: 'Adobe PDF Document', 
+        fileSize: '1.2 MB', 
+        isCompleted: false 
+      },
       { id: 'l5', title: 'JavaScript Logic Building', type: 'video', duration: '35:10', isCompleted: false },
       { 
         id: 'l6', 
@@ -93,7 +139,7 @@ const syllabus = ref([
   }
 ])
 
-const currentLessonId = ref('l3') 
+const currentLessonId = ref('q1') 
 
 const currentLesson = computed(() => {
   for (const mod of syllabus.value) {
@@ -232,6 +278,40 @@ const articleContent = `
             @submit="submitAssignment"
             @view-certificates="router.push('/student/certificates')"
           />
+
+          <QuizLesson 
+            v-else-if="currentLesson?.type === 'quiz'" 
+            :lesson="currentLesson"
+            @complete="markAsComplete"
+          />
+
+          <FileLesson 
+            v-else-if="currentLesson?.type === 'file'" 
+            :lesson="currentLesson"
+          />
+
+          <!-- Next Up: Quiz CTA (Discoverability Improvement) -->
+          <div 
+            v-if="currentLesson?.type !== 'quiz' && syllabus[0].lessons[2].id === 'q1' && !syllabus[0].lessons[2].isCompleted"
+            class="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex flex-col sm:flex-row items-center justify-between gap-4"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                <HelpCircle class="w-6 h-6" />
+              </div>
+              <div>
+                <p class="text-xs font-bold text-indigo-100 uppercase tracking-widest">Selanjutnya</p>
+                <h4 class="text-lg font-black uppercase tracking-tight">Kuis: Basic Web Development</h4>
+              </div>
+            </div>
+            <button 
+              @click="selectLesson('q1')"
+              class="px-5 py-2.5 bg-white text-indigo-600 font-black rounded-xl hover:bg-indigo-50 transition-all flex items-center gap-2 shadow-lg"
+            >
+              Mulai Kuis
+              <ChevronRight class="w-4 h-4" />
+            </button>
+          </div>
 
         </div>
 
