@@ -138,7 +138,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -172,7 +172,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -206,7 +206,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -240,7 +240,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -274,7 +274,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->
@@ -308,7 +308,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.webp" alt="HTML Icon">
         </div>
 
         <!-- Title -->

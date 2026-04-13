@@ -74,7 +74,7 @@ const highlightText = computed(() => {
   </section>
 
   <img
-    src="../../assets/images/pattern2.png"
+    src="../../assets/images/pattern2.webp"
     alt=""
     class="w-[200px] rotate-12 opacity-60"
   />

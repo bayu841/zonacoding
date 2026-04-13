@@ -18,7 +18,7 @@
         
         <!-- Logo -->
         <div class="flex justify-center mb-6">
-          <img src="../../assets/images/logo.png" alt="" class="w-24">
+          <img src="../../assets/images/logo.webp" alt="" class="w-24">
         </div>
 
         <h2 class="text-center text-xl font-semibold mb-6">

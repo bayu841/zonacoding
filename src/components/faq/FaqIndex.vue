@@ -81,9 +81,9 @@ const toggleFAQ = (index) => {
   <div class="flex justify-end px-10 mt-10">
   
   <img 
-    src="../../assets/images/pattern3.png" 
+    src="../../assets/images/pattern3.webp" 
     alt="" 
-    class="w-[200px] opacity-60 rotate-[12deg] ml-10"
+    class="w-[200px] opacity-60 rotate-[12deg] mr-10"
   />
 
 </div>
