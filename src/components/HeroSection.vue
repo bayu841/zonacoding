@@ -60,11 +60,11 @@ const highlightText = computed(() => {
           
           <button class="bg-gradient-to-r from-blue-600 to-indigo-600 
           text-white px-6 py-3 rounded-lg 
-          hover:translate-y-[-4px] transition w-full sm:w-auto">
+          hover:translate-y-[-4px] transition w-full sm:w-auto font-poppins">
             Mulai Belajar
           </button>
 
-          <button class="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-100 w-full sm:w-auto">
+          <button class="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-100 w-full sm:w-auto font-poppins">
             Lihat Kelas
           </button>
 

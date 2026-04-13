@@ -1,227 +1,120 @@
 <script setup>
 import ShinyText from "../components/ShinyText.vue";
 import GlareHover from "../components/GlareHover.vue";
+import javaImg from "../assets/images/java.webp";
+import githubImg from "../assets/images/github.webp";
+import phpImg from "../assets/images/php.webp";
+import bootstrapImg from "../assets/images/bootstrap.webp";
+
+const classes = [
+  {
+    title: "Java Fundamental Programming",
+    category: "Pemrograman Desktop",
+    image: javaImg,
+    price: "Rp. 300.000",
+  },
+  {
+    title: "Tutorial Github untuk Pemula",
+    category: "Version Control",
+    image: githubImg,
+    price: "Gratis!",
+  },
+  {
+    title: "Web Development dengan PHP Native",
+    category: "Backend Development",
+    image: phpImg,
+    price: "Rp. 150.000",
+
+  },
+  {
+    title: "Frontend dengan Bootstrap",
+    category: "Frontend Development",
+    image: bootstrapImg,
+    price: "Rp. 300.000",
+  },
+];
 </script>
 
 <template>
-    <div class="flex justify-end mr-2">
-      <img src="../assets/images/pattern3.webp" alt="" class="w-[210px] rotate-12">
-      </div>
-  <section class="text-center py-16 bg-[url('/src/assets/images/clasbg.webp')] bg-cover bg-center">
+  <!-- Background Pattern -->
+  <div class="flex justify-end mr-4">
+    <img src="../assets/images/pattern3.webp" class="w-[200px] rotate-12 opacity-70" />
+  </div>
+
+  <!-- Section -->
+<section class="text-center py-12 bg-gray-50 font-poppins text-gray-800">
+    <!-- Title -->
     <ShinyText
-      text="Jelajahi Kelas Teratas"
-      color="#3f58ee"
-      shineColor="#53c1de"
-      className="text-3xl font-semibold font-poppins pb-4"
+      text="Jelajahi Kelas Terbaik di Next Skill"
+      color="#1d4ed8"
+      shineColor="#60a5fa"
+      className="text-3xl font-bold font-poppins pb-6"
     />
-    <section class="max-w-6xl mx-auto px-10 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center ">
-        <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
-            >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
+
+    <p class="text-gray-500 mb-10 text-sm sm:text-base pt-1">
+      Tingkatkan skill kamu dengan kelas berkualitas dari Next Skill
+    </p>
+
+    <!-- Grid -->
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+      <!-- CARD -->
+      <GlareHover
+        v-for="(item, index) in classes"
+        :key="index"
+        class="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300 overflow-hidden group"
+      >
+
+        <!-- Image -->
+        <div class="relative overflow-hidden">
+          <img
+            :src="item.image"
+            class="w-full h-36 object-cover group-hover:scale-110 transition duration-500"
+          />
+
+          <!-- Badge -->
+          <span class="absolute top-3 left-3 bg-white/90 text-xs px-3 py-1 rounded-full shadow text-gray-600">
+            {{ item.category }}
+          </span>
         </div>
 
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
+        <!-- Content -->
+        <div class="p-5 text-left">
 
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
+          <!-- Title -->
+          <h3 class="font-semibold text-base leading-snug group-hover:text-blue-600 transition">
+            {{ item.title }}
+          </h3>
 
-    </div>
-</GlareHover>
- <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
+          <!-- Author -->
+          <p class="text-xs text-gray-400 mt-1">
+            By Next Skill
+          </p>
+
+          <!-- Price + Button -->
+          <div class="flex justify-between items-center mt-4">
+
+            <span
+              :class="item.price === 'Gratis!'
+                ? 'text-purple-600 font-bold'
+                : 'text-blue-600 font-bold'"
             >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
+              {{ item.price }}
+            </span>
+            <button class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                Detail
+            </button>
+          </div>
+
         </div>
-
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
-
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
+      </GlareHover>
 
     </div>
-</GlareHover>
-        <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
-            >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
-        </div>
 
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
+    <!-- Button -->
+    <button class="mt-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl">
+      Lihat Semua Kelas
+    </button>
 
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
-
-    </div>
-</GlareHover>
-        <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
-            >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
-        </div>
-
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
-
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
-
-    </div>
-</GlareHover>
-        <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
-            >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
-        </div>
-
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
-
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
-
-    </div>
-</GlareHover>
-        <GlareHover
-            class="w-full transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
-            background="#ffffff"
-            border-color="#e5e7eb"
-            border-radius="12px"
-            glare-color="#93c5fd"
-            :glare-opacity="0.25"
-            :glare-size="250"
-            :transition-duration="700"
-            >
-        <div class="p-7 text-start">
-        
-        <!-- Icon -->
-        <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../assets/images/html.webp" alt="HTML Icon">
-        </div>
-
-        <!-- Title -->
-        <h3 class="text-lg font-semibold mb-2 font-poppins">
-        Kelas HTML Dasar
-        </h3>
-        
-        <!-- Description -->
-        <p class="text-sm text-gray-500 leading-relaxed">
-            Kelas HTML Dasar adalah kelas yang mempelajari dasar-dasar pembuatan website menggunakan HTML, mulai dari struktur halaman, teks, gambar, link, hingga form sederhana.
-        </p>
-
-        <!-- Button -->
-        <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Coba Kelas
-        </button>
-
-    </div>
-    </GlareHover>
-    </section>
-     <button class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:to-blue-400 font-semibold">
-        Lihat Semua Kelas
-        </button>
   </section>
 </template>
