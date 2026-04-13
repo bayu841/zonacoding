@@ -3,20 +3,20 @@
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50 p-6 font-poppins">
-    
+
     <!-- Card -->
     <div class="w-full max-w-5xl bg-white backdrop-blur-lg rounded-3xl shadow-xl flex overflow-hidden">
-      
+
       <!-- LEFT SIDE -->
       <div class="hidden md:flex w-1/2  bg-gradient-to-r from-white via-blue-50 to-indigo-50 text-white p-10 flex-col justify-center relative">
-        
+
         <img src="../../assets/images/auth/loginhero.png" alt="" class="float w-98">
-       
+
       </div>
 
       <!-- RIGHT SIDE -->
       <div class="w-full md:w-1/2 p-10">
-        
+
         <!-- Logo -->
         <div class="flex justify-center mb-6">
          <img src="../../assets/images/logo.png" alt="" class="w-24">
@@ -28,7 +28,7 @@
 
         <!-- Form -->
         <form class="space-y-4">
-          
+
           <!-- Email -->
           <div>
             <label class="text-sm text-gray-600">Email</label>
@@ -62,7 +62,7 @@
               Remember me
             </label>
             <a href="#" class="text-blue-500 hover:underline">
-              Reset Password?
+              
             </a>
           </div>
 
