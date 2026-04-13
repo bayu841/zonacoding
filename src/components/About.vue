@@ -22,7 +22,7 @@ onMounted(() => {
 <template>
   <section 
     id="about"
-    class="py-14 px-20 md:px-6 transition-all duration-500"
+    class="py-14 px-5 md:px-6 transition-all duration-500"
     :class="isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
   >
     <!-- FIX TYPO DI SINI -->

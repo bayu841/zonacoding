@@ -51,7 +51,7 @@ const classes = [
       className="text-3xl font-bold font-poppins pb-6"
     />
 
-    <p class="text-gray-500 mb-10 text-sm sm:text-base pt-1">
+    <p class="text-gray-500 mb-10 text-sm sm:text-base pt-2 px-5 ">
       Tingkatkan skill kamu dengan kelas berkualitas dari Next Skill
     </p>
 
