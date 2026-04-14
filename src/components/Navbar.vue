@@ -10,7 +10,7 @@ const isOpen = ref(false);
 
       <!-- Logo -->
     <img src="../assets/images/logo.webp" alt=""
-    class="w-8">
+    class="w-7">
 
       <!-- Menu Desktop -->
       <ul class="hidden md:flex gap-8 text-gray-700 font-medium">
