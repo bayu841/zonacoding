@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import {
   LayoutDashboard,
   BookOpen,
@@ -11,71 +11,71 @@ import {
   Menu,
   LogOut,
   X,
-  FileCheck
-} from 'lucide-vue-next'
+  FileCheck,
+} from "lucide-vue-next";
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // State untuk sidebar desktop (expanded/collapsed)
-const isSidebarOpen = ref(true)
+const isSidebarOpen = ref(true);
 
 // State untuk mobile drawer (terbuka/tertutup)
-const isMobileDrawerOpen = ref(false)
+const isMobileDrawerOpen = ref(false);
 
 const navigationGroups = [
   {
-    title: 'Utama',
+    title: "Utama",
     items: [
-      { name: 'Dashboard', to: '/mentor', icon: LayoutDashboard, exact: true },
-      { name: 'Papan Peringkat', to: '/mentor/leaderboard', icon: Trophy }
-    ]
+      { name: "Dashboard", to: "/mentor", icon: LayoutDashboard, exact: true },
+      { name: "Papan Peringkat", to: "/mentor/leaderboard", icon: Trophy },
+    ],
   },
   {
-    title: 'Akademik',
+    title: "Akademik",
     items: [
-      { name: 'Kursus Saya', to: '/mentor/courses', icon: BookOpen },
-      { name: 'Penilaian Tugas', to: '/mentor/assignments', icon: FileCheck },
-      { name: 'Siswa Saya', to: '/mentor/students', icon: Users }
-    ]
+      { name: "Kursus Saya", to: "/mentor/courses", icon: BookOpen },
+      { name: "Penilaian Tugas", to: "/mentor/assignments", icon: FileCheck },
+      { name: "Siswa Saya", to: "/mentor/students", icon: Users },
+    ],
   },
   {
-    title: 'Sistem',
+    title: "Sistem",
     items: [
-      { name: 'Pendapatan', to: '/mentor/transactions', icon: Receipt },
-      { name: 'Pengaturan', to: '/mentor/settings', icon: Settings }
-    ]
-  }
-]
+      { name: "Pendapatan", to: "/mentor/transactions", icon: Receipt },
+      { name: "Pengaturan", to: "/mentor/settings", icon: Settings },
+    ],
+  },
+];
 
-const showDropdown = ref(false)
+const showDropdown = ref(false);
 
 const toggleMobileDrawer = () => {
-  isMobileDrawerOpen.value = !isMobileDrawerOpen.value
-}
+  isMobileDrawerOpen.value = !isMobileDrawerOpen.value;
+};
 
 const closeMobileDrawer = () => {
-  isMobileDrawerOpen.value = false
-}
+  isMobileDrawerOpen.value = false;
+};
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value
-}
+  showDropdown.value = !showDropdown.value;
+};
 
 const handleLogout = () => {
-  showDropdown.value = false
-  closeMobileDrawer()
-  router.push('/')
-}
+  showDropdown.value = false;
+  closeMobileDrawer();
+  router.push("/");
+};
 
 // Helper untuk mengecek apakah route saat ini aktif (termasuk nested)
 const isActiveRoute = (item) => {
   if (item.exact) {
-    return route.path === item.to
+    return route.path === item.to;
   }
   // Untuk non-exact, cocokkan prefix, tapi pastikan bukan dashboard
-  return route.path.startsWith(item.to)
-}
+  return route.path.startsWith(item.to);
+};
 </script>
 
 <template>
@@ -94,18 +94,23 @@ const isActiveRoute = (item) => {
         isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full',
         'md:translate-x-0',
         isSidebarOpen ? 'md:w-64' : 'md:w-20',
-        'w-64'
+        'w-64',
       ]"
     >
       <!-- Header Sidebar -->
-      <div class="h-16 flex items-center justify-between px-5 border-b border-gray-200/60">
+      <div
+        class="h-16 flex items-center justify-between px-5 border-b border-gray-200/60"
+      >
         <h1
           class="font-bold text-xl bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent transition-all"
           :class="{ 'md:hidden': !isSidebarOpen }"
         >
-          NextSkill Mentor
+          ZonaCoding Mentor
         </h1>
-        <h1 class="font-bold text-xl bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent hidden" :class="{ 'md:block': !isSidebarOpen }">
+        <h1
+          class="font-bold text-xl bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent hidden"
+          :class="{ 'md:block': !isSidebarOpen }"
+        >
           NM
         </h1>
 
@@ -119,14 +124,24 @@ const isActiveRoute = (item) => {
       </div>
 
       <nav class="flex-1 overflow-y-auto py-6 px-3 custom-scrollbar">
-        <div v-for="(group, gIdx) in navigationGroups" :key="gIdx" class="mb-6 last:mb-0">
-          <h3 class="px-4 text-[11px] font-extrabold text-teal-400 uppercase tracking-widest mb-3 flex items-center gap-2" :class="{ 'md:hidden': !isSidebarOpen }">
+        <div
+          v-for="(group, gIdx) in navigationGroups"
+          :key="gIdx"
+          class="mb-6 last:mb-0"
+        >
+          <h3
+            class="px-4 text-[11px] font-extrabold text-teal-400 uppercase tracking-widest mb-3 flex items-center gap-2"
+            :class="{ 'md:hidden': !isSidebarOpen }"
+          >
             {{ group.title }}
           </h3>
-          <div class="h-4 w-full flex items-center justify-center mb-3 hidden" :class="{ 'md:flex': !isSidebarOpen }">
+          <div
+            class="h-4 w-full flex items-center justify-center mb-3 hidden"
+            :class="{ 'md:flex': !isSidebarOpen }"
+          >
             <div class="w-1 h-1 rounded-full bg-gray-300"></div>
           </div>
-          
+
           <ul class="space-y-1.5">
             <li v-for="item in group.items" :key="item.name">
               <router-link
@@ -138,11 +153,17 @@ const isActiveRoute = (item) => {
                   { 'md:justify-center': !isSidebarOpen },
                   isActiveRoute(item)
                     ? 'bg-emerald-50 text-emerald-700 font-medium shadow-[0_2px_8px_rgba(16,185,129,0.08)]'
-                    : ''
+                    : '',
                 ]"
               >
-                <component :is="item.icon" class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105" />
-                <span class="ml-3 whitespace-nowrap text-[15px]" :class="{ 'md:hidden': !isSidebarOpen }">
+                <component
+                  :is="item.icon"
+                  class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105"
+                />
+                <span
+                  class="ml-3 whitespace-nowrap text-[15px]"
+                  :class="{ 'md:hidden': !isSidebarOpen }"
+                >
                   {{ item.name }}
                 </span>
               </router-link>

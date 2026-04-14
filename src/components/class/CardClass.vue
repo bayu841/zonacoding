@@ -32,7 +32,6 @@ const classes = [
     category: "Backend Development",
     image: phpImg,
     price: "Rp. 150.000",
-
   },
   {
     title: "Frontend dengan Bootstrap",
@@ -45,7 +44,6 @@ const classes = [
 
 <template>
   <section class="text-center pt-6" id="class">
-
     <!-- Title -->
     <ShinyText
       text="Jelajahi Kelas"
@@ -56,12 +54,12 @@ const classes = [
     <p class="text-gray-600 font-poppins text-sm py-2">
       Temukan berbagai macam kelas yang sesuai dengan minat dan keahlian Anda.
     </p>
-    <section class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 px-6 py-6">
-
+    <section
+      class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 px-6 py-6"
+    >
       <!-- SIDEBAR -->
       <div class="lg:w-1/4 w-full text-left">
         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-
           <h3 class="text-lg font-semibold mb-5 text-gray-800">
             Kategori Kelas
           </h3>
@@ -70,8 +68,7 @@ const classes = [
             <li
               v-for="(cat, i) in categories"
               :key="i"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer
-                     hover:bg-blue-50 hover:shadow-sm transition group border border-gray-100"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-blue-50 hover:shadow-sm transition group border border-gray-100"
             >
               <div class="w-3 h-3 rounded-full bg-blue-500"></div>
               <span class="font-medium text-gray-700 group-hover:text-blue-600">
@@ -83,15 +80,16 @@ const classes = [
 
         <!-- Decoration -->
         <div class="rotate-12 py-20 hidden sm:block">
-          <img src="../../assets/images/class/pattern1.png" class="w-[180px] opacity-70" />
+          <img
+            src="../../assets/images/class/pattern1.png"
+            class="w-[180px] opacity-70"
+          />
         </div>
       </div>
 
       <!-- CONTENT -->
       <div class="lg:w-3/4 w-full">
-
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
           <!-- CARD -->
           <GlareHover
             v-for="(item, index) in classes"
@@ -106,7 +104,6 @@ const classes = [
             :transition-duration="700"
           >
             <div class="group hover:-translate-y-2 transition duration-300">
-
               <!-- Image -->
               <div class="relative overflow-hidden">
                 <img
@@ -115,47 +112,48 @@ const classes = [
                 />
 
                 <!-- Badge -->
-                <span class="absolute top-3 left-3 bg-white/90 text-xs px-3 py-1 rounded-full shadow text-gray-600">
+                <span
+                  class="absolute top-3 left-3 bg-white/90 text-xs px-3 py-1 rounded-full shadow text-gray-600"
+                >
                   {{ item.category }}
                 </span>
               </div>
 
               <!-- Content -->
               <div class="p-4 text-left">
-
                 <!-- Title -->
-                <h3 class="font-semibold text-sm leading-snug group-hover:text-blue-600 transition">
+                <h3
+                  class="font-semibold text-sm leading-snug group-hover:text-blue-600 transition"
+                >
                   {{ item.title }}
                 </h3>
 
                 <!-- Author -->
-                <p class="text-xs text-gray-400 mt-1">
-                  By Next Skill
-                </p>
+                <p class="text-xs text-gray-400 mt-1">By Zona Coding</p>
 
                 <!-- Price -->
                 <div class="flex justify-between items-center mt-4">
                   <span
-                    :class="item.price === 'Gratis!'
-                      ? 'text-purple-600 font-bold'
-                      : 'text-blue-600 font-bold'"
+                    :class="
+                      item.price === 'Gratis!'
+                        ? 'text-purple-600 font-bold'
+                        : 'text-blue-600 font-bold'
+                    "
                   >
                     {{ item.price }}
                   </span>
 
-                  <button class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                  <button
+                    class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition"
+                  >
                     Detail
                   </button>
                 </div>
-
               </div>
             </div>
           </GlareHover>
-
         </div>
-
       </div>
-
     </section>
   </section>
 </template>

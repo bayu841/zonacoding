@@ -1,24 +1,30 @@
 <script setup>
-import { Search, Filter, UserCheck, Plus } from 'lucide-vue-next'
+import { Search, Filter, UserCheck, Plus } from "lucide-vue-next";
 
 defineProps({
   searchQuery: String,
-  filterStatus: String
-})
+  filterStatus: String,
+});
 
-defineEmits(['update:searchQuery', 'update:filterStatus'])
+defineEmits(["update:searchQuery", "update:filterStatus"]);
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Header with title and verification button -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+    >
       <div>
         <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-          <span class="w-1.5 h-7 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full mr-3"></span>
+          <span
+            class="w-1.5 h-7 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full mr-3"
+          ></span>
           Manajemen Mentor
         </h2>
-        <p class="text-sm text-gray-500 mt-1">Kelola instruktur dan ahli industri NextSkill</p>
+        <p class="text-sm text-gray-500 mt-1">
+          Kelola instruktur dan ahli industri ZonaCoding
+        </p>
       </div>
       <router-link
         to="/admin/mentors/verification"
@@ -30,11 +36,15 @@ defineEmits(['update:searchQuery', 'update:filterStatus'])
     </div>
 
     <!-- Filter Bar -->
-    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/50 backdrop-blur-sm p-2 rounded-2xl border border-gray-100">
+    <div
+      class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/50 backdrop-blur-sm p-2 rounded-2xl border border-gray-100"
+    >
       <div class="flex flex-col sm:flex-row flex-1 gap-3 w-full">
         <!-- Search Input -->
         <div class="relative flex-1 sm:max-w-md">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          />
           <input
             type="text"
             :value="searchQuery"
@@ -56,7 +66,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus'])
             <option value="Pending">Pending</option>
             <option value="Rejected">Rejected</option>
           </select>
-          <Filter class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Filter
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
         </div>
       </div>
     </div>

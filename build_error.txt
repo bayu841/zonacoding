@@ -1,9 +1,10 @@
 
-> nextskill-fe@0.0.0 build
+> ZonaCoding-fe@0.0.0 build
 > vite build
 
 vite v8.0.8 building client environment for production...
-[2Ktransforming...✓ 1783 modules transformed.
+[2K
+transforming...✓ 1783 modules transformed.
 ✗ Build failed in 5.97s
 error during build:
 Build failed with 2 errors:

@@ -5,13 +5,13 @@ import { ChevronDown } from "lucide-vue-next";
 // data FAQ
 const faqs = ref([
   {
-    question: "Apa itu NextSkill?",
+    question: "Apa itu ZonaCoding?",
     answer:
-      "NextSkill adalah platform pembelajaran online untuk meningkatkan skill kamu dengan mudah dan praktis.",
+      "ZonaCoding adalah platform pembelajaran online untuk meningkatkan skill kamu dengan mudah dan praktis.",
     open: false,
   },
   {
-    question: "Apakah belajar di NextSkill gratis?",
+    question: "Apakah belajar di ZonaCoding gratis?",
     answer:
       "Ada kelas gratis dan juga kelas premium. Kamu bisa pilih sesuai kebutuhan kamu.",
     open: false,
@@ -37,19 +37,18 @@ const toggleFAQ = (index) => {
 
 <template>
   <section class="max-w-4xl mx-auto px-4">
-    
-    <h2 class="text-3xl font-semibold text-center text-gray-800 mb-10 font-poppins">
+    <h2
+      class="text-3xl font-semibold text-center text-gray-800 mb-10 font-poppins"
+    >
       Frequently Asked Questions
     </h2>
 
     <div class="space-y-4">
-
       <div
         v-for="(faq, index) in faqs"
         :key="index"
         class="border rounded-xl bg-white shadow-sm overflow-hidden transition"
       >
-        
         <!-- QUESTION -->
         <button
           @click="toggleFAQ(index)"
@@ -79,12 +78,10 @@ const toggleFAQ = (index) => {
     </div>
   </section>
   <div class="flex justify-end px-10 mt-10">
-  
-  <img 
-    src="../../assets/images/pattern3.webp" 
-    alt="" 
-    class="w-[200px] opacity-60 rotate-[12deg] mr-10"
-  />
-
-</div>
+    <img
+      src="../../assets/images/pattern3.webp"
+      alt=""
+      class="w-[200px] opacity-60 rotate-[12deg] mr-10"
+    />
+  </div>
 </template>

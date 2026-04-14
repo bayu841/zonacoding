@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 
 // FULL TEXT (FAQ HERO)
-const fullText = "Update Terbaru & Insight Menarik di NextSkill";
+const fullText = "Update Terbaru & Insight Menarik di ZonaCoding";
 
 const typedText = ref("");
 let index = 0;
@@ -20,32 +20,33 @@ onMounted(() => {
 });
 
 const beforeText = computed(() => {
-  return typedText.value.replace("NextSkill", "");
+  return typedText.value.replace("ZonaCoding", "");
 });
 
 const highlightText = computed(() => {
-  return typedText.value.includes("NextSkill") ? "NextSkill" : "";
+  return typedText.value.includes("ZonaCoding") ? "ZonaCoding" : "";
 });
 </script>
 
 <template>
   <section
-    class="min-h-screen flex items-center px-4 md:px-6 pt-16 
-    bg-gradient-to-r from-white via-blue-50 to-indigo-50"
+    class="min-h-screen flex items-center px-4 md:px-6 pt-16 bg-gradient-to-r from-white via-blue-50 to-indigo-50"
   >
     <div
       class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-20"
     >
       <!-- KIRI (TEXT) -->
       <div class="md:w-1/2 text-center md:text-left px-4 md:px-12 py-3">
-        
-        <h1 class="font-poppins text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-800">
+        <h1
+          class="font-poppins text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-800"
+        >
           {{ beforeText }}
           <span class="text-blue-600">{{ highlightText }}</span>
         </h1>
 
         <p class="mt-4 text-gray-600 text-base sm:text-lg">
-            Dapatkan informasi terbaru seputar dunia belajar, teknologi, dan pengembangan skill yang wajib kamu tahu.
+          Dapatkan informasi terbaru seputar dunia belajar, teknologi, dan
+          pengembangan skill yang wajib kamu tahu.
         </p>
       </div>
 

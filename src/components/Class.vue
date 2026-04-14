@@ -24,7 +24,6 @@ const classes = [
     category: "Backend Development",
     image: phpImg,
     price: "Rp. 150.000",
-
   },
   {
     title: "Frontend dengan Bootstrap",
@@ -38,33 +37,39 @@ const classes = [
 <template>
   <!-- Background Pattern -->
   <div class="flex justify-end mr-4">
-    <img src="../assets/images/pattern3.webp" class="w-[200px] rotate-12 opacity-70" />
+    <img
+      src="../assets/images/pattern3.webp"
+      class="w-[200px] rotate-12 opacity-70"
+    />
   </div>
 
   <!-- Section -->
-<section class="text-center py-12 bg-gray-50 font-poppins text-gray-800" id="topclass">
+  <section
+    class="text-center py-12 bg-gray-50 font-poppins text-gray-800"
+    id="topclass"
+  >
     <!-- Title -->
     <ShinyText
-      text="Jelajahi Kelas Terbaik di Next Skill"
+      text="Jelajahi Kelas Terbaik di ZonaCoding"
       color="#1d4ed8"
       shineColor="#60a5fa"
       class="text-3xl font-bold font-poppins pb-6"
     />
 
-    <p class="text-gray-500 mb-10 text-sm sm:text-base pt-2 px-5 ">
-      Tingkatkan skill kamu dengan kelas berkualitas dari Next Skill
+    <p class="text-gray-500 mb-10 text-sm sm:text-base pt-2 px-5">
+      Tingkatkan skill kamu dengan kelas berkualitas dari ZonaCoding.
     </p>
 
     <!-- Grid -->
-    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-
+    <div
+      class="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+    >
       <!-- CARD -->
       <GlareHover
         v-for="(item, index) in classes"
         :key="index"
         class="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300 overflow-hidden group"
       >
-
         <!-- Image -->
         <div class="relative overflow-hidden">
           <img
@@ -73,51 +78,52 @@ const classes = [
           />
 
           <!-- Badge -->
-          <span class="absolute top-3 left-3 bg-white/90 text-xs px-3 py-1 rounded-full shadow text-gray-600">
+          <span
+            class="absolute top-3 left-3 bg-white/90 text-xs px-3 py-1 rounded-full shadow text-gray-600"
+          >
             {{ item.category }}
           </span>
         </div>
 
         <!-- Content -->
         <div class="p-5 text-left">
-
           <!-- Title -->
-          <h3 class="font-semibold text-base leading-snug group-hover:text-blue-600 transition">
+          <h3
+            class="font-semibold text-base leading-snug group-hover:text-blue-600 transition"
+          >
             {{ item.title }}
           </h3>
 
           <!-- Author -->
-          <p class="text-xs text-gray-400 mt-1">
-            By Next Skill
-          </p>
+          <p class="text-xs text-gray-400 mt-1">By Zona Coding</p>
 
           <!-- Price + Button -->
           <div class="flex justify-between items-center mt-4">
-
             <span
-              :class="item.price === 'Gratis!'
-                ? 'text-purple-600 font-bold'
-                : 'text-blue-600 font-bold'"
+              :class="
+                item.price === 'Gratis!'
+                  ? 'text-purple-600 font-bold'
+                  : 'text-blue-600 font-bold'
+              "
             >
               {{ item.price }}
             </span>
-            <button class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition">
-                Detail
+            <button
+              class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition"
+            >
+              Detail
             </button>
           </div>
-
         </div>
       </GlareHover>
-
     </div>
 
-<!-- Button -->
-  <RouterLink
-    to="/class"
-    class="mt-12 inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl"
-  >
-    Lihat Semua Kelas
-  </RouterLink>
-
+    <!-- Button -->
+    <RouterLink
+      to="/class"
+      class="mt-12 inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl"
+    >
+      Lihat Semua Kelas
+    </RouterLink>
   </section>
 </template>

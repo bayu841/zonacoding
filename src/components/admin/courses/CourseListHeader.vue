@@ -1,26 +1,37 @@
 <script setup>
-import { Search, Filter, Grid, List, Plus } from 'lucide-vue-next'
+import { Search, Filter, Grid, List, Plus } from "lucide-vue-next";
 
 defineProps({
   searchQuery: String,
   filterStatus: String,
   filterCategory: String,
-  viewMode: String
-})
+  viewMode: String,
+});
 
-defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory', 'update:viewMode'])
+defineEmits([
+  "update:searchQuery",
+  "update:filterStatus",
+  "update:filterCategory",
+  "update:viewMode",
+]);
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Header with title and add button -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+    >
       <div>
         <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-          <span class="w-1.5 h-7 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full mr-3"></span>
+          <span
+            class="w-1.5 h-7 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full mr-3"
+          ></span>
           Manajemen Kursus
         </h2>
-        <p class="text-sm text-gray-500 mt-1">Kelola kurikulum dan konten pembelajaran NextSkill</p>
+        <p class="text-sm text-gray-500 mt-1">
+          Kelola kurikulum dan konten pembelajaran ZonaCoding
+        </p>
       </div>
       <router-link
         to="/admin/courses/create"
@@ -32,11 +43,15 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory
     </div>
 
     <!-- Filter Bar & View Toggle -->
-    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <div
+      class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+    >
       <div class="flex flex-col sm:flex-row flex-1 gap-3 w-full">
         <!-- Search Input -->
         <div class="relative flex-1 sm:max-w-xs">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          />
           <input
             type="text"
             :value="searchQuery"
@@ -57,7 +72,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory
             <option value="Published">Published</option>
             <option value="Draft">Draft</option>
           </select>
-          <Filter class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Filter
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
         </div>
 
         <!-- Category Filter -->
@@ -72,7 +89,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory
             <option value="Backend">Backend</option>
             <option value="Design">Design</option>
           </select>
-          <Filter class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Filter
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
         </div>
       </div>
 
@@ -82,7 +101,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory
           @click="$emit('update:viewMode', 'table')"
           :class="[
             'p-2 rounded-lg transition-colors',
-            viewMode === 'table' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'table'
+              ? 'bg-white text-indigo-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700',
           ]"
           title="Tampilan Tabel"
         >
@@ -92,7 +113,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'update:filterCategory
           @click="$emit('update:viewMode', 'grid')"
           :class="[
             'p-2 rounded-lg transition-colors',
-            viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'grid'
+              ? 'bg-white text-indigo-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700',
           ]"
           title="Tampilan Kartu"
         >

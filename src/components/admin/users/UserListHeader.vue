@@ -1,25 +1,36 @@
 <script setup>
-import { Search, Filter, Grid, List, UserPlus } from 'lucide-vue-next'
+import { Search, Filter, Grid, List, UserPlus } from "lucide-vue-next";
 
 defineProps({
   filterRole: String,
   searchQuery: String,
-  viewMode: String
-})
+  viewMode: String,
+});
 
-defineEmits(['update:filterRole', 'update:searchQuery', 'update:viewMode', 'open-create'])
+defineEmits([
+  "update:filterRole",
+  "update:searchQuery",
+  "update:viewMode",
+  "open-create",
+]);
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Header dengan judul dan tombol tambah -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+    >
       <div>
         <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-          <span class="w-1.5 h-7 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3"></span>
+          <span
+            class="w-1.5 h-7 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3"
+          ></span>
           Manajemen Pengguna
         </h2>
-        <p class="text-sm text-gray-500 mt-1">Kelola semua akun pengguna platform NextSkill</p>
+        <p class="text-sm text-gray-500 mt-1">
+          Kelola semua akun pengguna platform ZonaCoding
+        </p>
       </div>
       <button
         @click="$emit('open-create')"
@@ -31,11 +42,15 @@ defineEmits(['update:filterRole', 'update:searchQuery', 'update:viewMode', 'open
     </div>
 
     <!-- Filter Bar & View Toggle -->
-    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <div
+      class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+    >
       <div class="flex flex-1 gap-3 w-full sm:w-auto">
         <!-- Search Input -->
         <div class="relative flex-1 sm:max-w-xs">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          />
           <input
             type="text"
             :value="searchQuery"
@@ -56,7 +71,9 @@ defineEmits(['update:filterRole', 'update:searchQuery', 'update:viewMode', 'open
             <option value="mentor">Mentor</option>
             <option value="admin">Admin</option>
           </select>
-          <Filter class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Filter
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
         </div>
       </div>
 
@@ -66,7 +83,9 @@ defineEmits(['update:filterRole', 'update:searchQuery', 'update:viewMode', 'open
           @click="$emit('update:viewMode', 'table')"
           :class="[
             'p-2 rounded-lg transition-colors',
-            viewMode === 'table' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'table'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700',
           ]"
           title="Tampilan Tabel"
         >
@@ -76,7 +95,9 @@ defineEmits(['update:filterRole', 'update:searchQuery', 'update:viewMode', 'open
           @click="$emit('update:viewMode', 'grid')"
           :class="[
             'p-2 rounded-lg transition-colors',
-            viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            viewMode === 'grid'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700',
           ]"
           title="Tampilan Kartu"
         >

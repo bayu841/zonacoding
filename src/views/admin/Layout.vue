@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import {
   LayoutDashboard,
   Users,
@@ -13,86 +13,87 @@ import {
   Menu,
   LogOut,
   X,
-  UserCheck
-} from 'lucide-vue-next'
+  UserCheck,
+} from "lucide-vue-next";
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // State untuk sidebar desktop (expanded/collapsed)
-const isSidebarOpen = ref(true)
+const isSidebarOpen = ref(true);
 
 // State untuk mobile drawer (terbuka/tertutup)
-const isMobileDrawerOpen = ref(false)
+const isMobileDrawerOpen = ref(false);
 
 const navigationGroups = [
   {
-    title: 'Utama',
+    title: "Utama",
     items: [
-      { name: 'Dashboard', to: '/admin', icon: LayoutDashboard, exact: true },
-      { name: 'Papan Peringkat', to: '/admin/leaderboard', icon: Trophy }
-    ]
+      { name: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
+      { name: "Papan Peringkat", to: "/admin/leaderboard", icon: Trophy },
+    ],
   },
   {
-    title: 'Akademik',
+    title: "Akademik",
     items: [
-      { name: 'Kategori Kursus', to: '/admin/categories', icon: Tags },
-      { name: 'Manajemen Kursus', to: '/admin/courses', icon: BookOpen },
-      { name: 'Manajemen Mentor', to: '/admin/mentors', icon: GraduationCap },
-      { name: 'Manajemen Pengguna', to: '/admin/users', icon: Users }
-    ]
+      { name: "Kategori Kursus", to: "/admin/categories", icon: Tags },
+      { name: "Manajemen Kursus", to: "/admin/courses", icon: BookOpen },
+      { name: "Manajemen Mentor", to: "/admin/mentors", icon: GraduationCap },
+      { name: "Manajemen Pengguna", to: "/admin/users", icon: Users },
+    ],
   },
   {
-    title: 'Sistem',
+    title: "Sistem",
     items: [
-      { name: 'Transaksi', to: '/admin/transactions', icon: Receipt },
-      { name: 'Pengaturan', to: '/admin/settings', icon: Settings }
-    ]
-  }
-]
+      { name: "Transaksi", to: "/admin/transactions", icon: Receipt },
+      { name: "Pengaturan", to: "/admin/settings", icon: Settings },
+    ],
+  },
+];
 
-const showDropdown = ref(false)
+const showDropdown = ref(false);
 
 const toggleMobileDrawer = () => {
-  isMobileDrawerOpen.value = !isMobileDrawerOpen.value
-}
+  isMobileDrawerOpen.value = !isMobileDrawerOpen.value;
+};
 
 const closeMobileDrawer = () => {
-  isMobileDrawerOpen.value = false
-}
+  isMobileDrawerOpen.value = false;
+};
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value
-}
+  showDropdown.value = !showDropdown.value;
+};
 
 const handleLogout = () => {
-  showDropdown.value = false
-  closeMobileDrawer()
-  router.push('/')
-}
+  showDropdown.value = false;
+  closeMobileDrawer();
+  router.push("/");
+};
 
 // Helper untuk mengecek apakah route saat ini aktif (termasuk nested)
 const isActiveRoute = (item) => {
   if (item.exact) {
-    return route.path === item.to
+    return route.path === item.to;
   }
-  
+
   // Jika path saat ini diawali dengan item.to
   if (route.path.startsWith(item.to)) {
     // Cari apakah ada item navigasi lain yang lebih spesifik (lebih panjang) yang juga cocok
-    const allItems = navigationGroups.flatMap(g => g.items)
-    const hasBetterMatch = allItems.some(other => 
-      other.to !== item.to && 
-      other.to.startsWith(item.to) && 
-      route.path.startsWith(other.to)
-    )
-    
+    const allItems = navigationGroups.flatMap((g) => g.items);
+    const hasBetterMatch = allItems.some(
+      (other) =>
+        other.to !== item.to &&
+        other.to.startsWith(item.to) &&
+        route.path.startsWith(other.to),
+    );
+
     // Aktifkan hanya jika tidak ada match yang lebih mendalam
-    return !hasBetterMatch
+    return !hasBetterMatch;
   }
-  
-  return false
-}
+
+  return false;
+};
 </script>
 
 <template>
@@ -111,18 +112,23 @@ const isActiveRoute = (item) => {
         isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full',
         'md:translate-x-0',
         isSidebarOpen ? 'md:w-64' : 'md:w-20',
-        'w-64'
+        'w-64',
       ]"
     >
       <!-- Header Sidebar -->
-      <div class="h-16 flex items-center justify-between px-5 border-b border-gray-200/60">
+      <div
+        class="h-16 flex items-center justify-between px-5 border-b border-gray-200/60"
+      >
         <h1
           class="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent transition-all"
           :class="{ 'md:hidden': !isSidebarOpen }"
         >
-          NextSkill Admin
+          ZonaCoding Admin
         </h1>
-        <h1 class="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent hidden" :class="{ 'md:block': !isSidebarOpen }">
+        <h1
+          class="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent hidden"
+          :class="{ 'md:block': !isSidebarOpen }"
+        >
           NS
         </h1>
 
@@ -136,11 +142,21 @@ const isActiveRoute = (item) => {
       </div>
 
       <nav class="flex-1 overflow-y-auto py-6 px-3 custom-scrollbar">
-        <div v-for="(group, gIdx) in navigationGroups" :key="gIdx" class="mb-6 last:mb-0">
-          <h3 class="px-4 text-[11px] font-extrabold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2" :class="{ 'md:hidden': !isSidebarOpen }">
+        <div
+          v-for="(group, gIdx) in navigationGroups"
+          :key="gIdx"
+          class="mb-6 last:mb-0"
+        >
+          <h3
+            class="px-4 text-[11px] font-extrabold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2"
+            :class="{ 'md:hidden': !isSidebarOpen }"
+          >
             {{ group.title }}
           </h3>
-          <div class="h-4 w-full flex items-center justify-center mb-3 hidden" :class="{ 'md:flex': !isSidebarOpen }">
+          <div
+            class="h-4 w-full flex items-center justify-center mb-3 hidden"
+            :class="{ 'md:flex': !isSidebarOpen }"
+          >
             <div class="w-1 h-1 rounded-full bg-gray-300"></div>
           </div>
 
@@ -155,11 +171,17 @@ const isActiveRoute = (item) => {
                   { 'md:justify-center': !isSidebarOpen },
                   isActiveRoute(item)
                     ? 'bg-blue-50 text-blue-700 font-medium shadow-[0_2px_8px_rgba(59,130,246,0.08)]'
-                    : ''
+                    : '',
                 ]"
               >
-                <component :is="item.icon" class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105" />
-                <span class="ml-3 whitespace-nowrap text-[15px]" :class="{ 'md:hidden': !isSidebarOpen }">
+                <component
+                  :is="item.icon"
+                  class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105"
+                />
+                <span
+                  class="ml-3 whitespace-nowrap text-[15px]"
+                  :class="{ 'md:hidden': !isSidebarOpen }"
+                >
                   {{ item.name }}
                 </span>
               </router-link>
