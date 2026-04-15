@@ -158,9 +158,9 @@ export const markLessonComplete = async (lessonId) => {
   }
 };
 
-export const updateLessonProgress = async (lessonId, data = {}) => {
+export const updateLessonProgress = async (lessonId) => {
   try {
-    const response = await API.post(`/lessons/${lessonId}/progress`, data);
+    const response = await API.get(`/lessons/${lessonId}/progress`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error;

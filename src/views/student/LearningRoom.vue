@@ -263,9 +263,7 @@ const markAsComplete = async () => {
     await markLessonComplete(currentLessonId.value);
 
     // Call API to update progress
-    await updateLessonProgress(currentLessonId.value, {
-      completed_at: new Date().toISOString(),
-    });
+    await updateLessonProgress(currentLessonId.value);
 
     // Update local state
     if (!finishedLessons.value.includes(currentLessonId.value)) {
