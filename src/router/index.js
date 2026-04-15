@@ -316,7 +316,7 @@ const router = createRouter({
   }
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const authStore = useAuthStore();
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
@@ -330,21 +330,18 @@ router.beforeEach((to, from, next) => {
   if (isAuthPage && authStore.isAuthenticated) {
     // Redirect based on role
     if (authStore.user?.role === "admin") {
-      next({ name: "admin.dashboard" });
+      return { name: "admin.dashboard" };
     } else if (authStore.user?.role === "mentor") {
-      next({ name: "mentor.dashboard" });
+      return { name: "mentor.dashboard" };
     } else {
-      next({ name: "student.dashboard" });
+      return { name: "student.dashboard" };
     }
-    return;
   }
 
   if (requiresAuth && !authStore.isAuthenticated) {
-    next({ name: "login" });
+    return { name: "login" };
   } else if (requiredRole && authStore.user?.role !== requiredRole) {
-    next({ name: "Forbidden" });
-  } else {
-    next();
+    return { name: "Forbidden" };
   }
 });
 

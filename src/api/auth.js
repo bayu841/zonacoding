@@ -26,6 +26,11 @@ export const logout = async () => {
     const response = await API.post("/logout");
     return response.data;
   } catch (error) {
+    // If token is already invalid (401/422), still clear auth on frontend
+    // Backend returns 401 when token expired/missing - this is expected
+    if (error.response?.status === 401 || error.response?.status === 422) {
+      return { message: "Logged out" };
+    }
     throw error.response ? error.response.data : error;
   }
 };

@@ -32,7 +32,15 @@ api.interceptors.response.use(
       localStorage.removeItem('user');
       removeCookie('token');
       
-      // Optional: Optional redirect to login can be handled by router guards
+      // Clear pinia auth store to trigger router guard
+      try {
+        const { useAuthStore } = require('@/stores/authStore');
+        const authStore = useAuthStore();
+        authStore.clearAuth();
+      } catch (e) {
+        // If store import fails, at least storage is cleared
+        console.error('Auto logout failed:', e);
+      }
     }
     return Promise.reject(error);
   }

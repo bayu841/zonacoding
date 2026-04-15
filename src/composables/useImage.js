@@ -1,11 +1,11 @@
 /**
- * Composable for robust image handling including proxy and error fallback.
+ * Composable for image handling using env storage API.
  */
 export const useImage = () => {
-  const DEFAULT_PLACEHOLDER = "https://placehold.co/600x400?text=NextSkill";
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL || "";
 
   /**
-   * Checks if a string is a single emoji or contains emojis that shouldn't be proxied.
+   * Checks if a string is a single emoji or contains emojis that shouldn't be processed.
    */
   const isEmoji = (str) => {
     if (!str) return false;
@@ -15,41 +15,46 @@ export const useImage = () => {
   };
 
   /**
-   * Generates a proxy URL to bypass CORP/CORS restrictions.
+   * Generates image URL from env storage API.
+   * If URL is relative path, prepend STORAGE_URL.
+   * If URL is already full URL, return as is.
    */
   const getProxyUrl = (url) => {
-    if (!url) return DEFAULT_PLACEHOLDER;
-    
-    // Handle nested storage URLs (e.g. http://.../storage/https://...)
-    if (url.includes('/storage/http')) {
-      const nestedUrl = url.split('/storage/')[1];
-      if (nestedUrl) return getProxyUrl(nestedUrl);
-    }
+    if (!url) return null;
 
-    // If it's an emoji, return it as is (or return null to let component handle it as text)
+    // If it's an emoji, return null to let component handle it
     if (isEmoji(url) && !url.includes("http")) return null;
 
-    // If it's a full URL that contains an emoji at the end (malformed backend URL)
-    if (isEmoji(url) && url.includes("/storage/")) return null;
+    // If URL already contains full path (starts with http), return as is
+    if (url.startsWith("http")) return url;
 
-    // Remove http:// or https:// for weserv
-    const cleanUrl = url.replace(/^https?:\/\//, "");
-    return `https://images.weserv.nl/?url=${cleanUrl}&default=${encodeURIComponent(DEFAULT_PLACEHOLDER)}`;
+    // Otherwise, construct URL from env storage
+    // Remove leading slash if present to avoid double slashes
+    let cleanPath = url.startsWith("/") ? url.slice(1) : url;
+    
+    // Prevent double storage path if backend already includes 'storage/'
+    if (cleanPath.startsWith('storage/')) {
+      cleanPath = cleanPath.substring(8);
+    }
+
+    return `${STORAGE_URL}/${cleanPath}`;
   };
 
   /**
-   * Handles image load errors to prevent infinite loops.
+   * Handles image load errors - provide fallback instead of hiding.
    */
   const handleImageError = (e) => {
     // Prevent infinite recursion by removing the error listener
     e.target.onerror = null;
-    e.target.src = DEFAULT_PLACEHOLDER;
+    // Set fallback image
+    e.target.src = 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80';
+    e.target.style.display = "block";
   };
 
   return {
     getProxyUrl,
     handleImageError,
     isEmoji,
-    DEFAULT_PLACEHOLDER,
+    STORAGE_URL,
   };
 };

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useRouter } from "vue-router";
 import { login as loginApi, register as registerApi, logout as logoutApi } from "@/api/auth";
 
 const safeParse = (key) => {
@@ -53,6 +54,9 @@ export const useAuthStore = defineStore("auth", {
         console.error("Logout error:", error);
       } finally {
         this.clearAuth();
+        // Redirect to login page
+        const router = useRouter();
+        router.push("/login");
       }
     },
 
