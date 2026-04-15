@@ -12,7 +12,7 @@ const { getProxyUrl, handleImageError } = useImage();
 
       <!-- Logo -->
     <img src="../assets/images/logo.webp" alt="NextSkill"
-    class="w-10" @error="handleImageError">
+    class="w-6" @error="handleImageError">
 
       <!-- Menu Desktop -->
       <ul class="hidden md:flex gap-8 text-gray-700 font-medium">
