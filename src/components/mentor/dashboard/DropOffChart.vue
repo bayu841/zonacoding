@@ -9,20 +9,28 @@ import {
   CategoryScale,
   LinearScale
 } from 'chart.js'
+import { computed } from 'vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-const chartData = {
-  labels: ['Modul 1', 'Modul 2', 'Modul 3', 'Modul 4', 'Modul 5', 'Modul 6'],
+const props = defineProps({
+  categories: {
+    type: Array,
+    default: () => []
+  }
+})
+
+const chartData = computed(() => ({
+  labels: props.categories.map(c => c.category),
   datasets: [
     {
-      label: 'Siswa Aktif',
+      label: 'Jumlah Siswa',
       backgroundColor: '#10b981',
-      data: [350, 320, 280, 150, 120, 100],
+      data: props.categories.map(c => c.jumlah_siswa),
       borderRadius: 8
     }
   ]
-}
+}))
 
 const chartOptions = {
   responsive: true,
@@ -51,22 +59,15 @@ const chartOptions = {
 <template>
   <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-6">
     <div class="mb-6">
-      <h2 class="text-lg font-bold text-gray-800">Analitik Drop-off Modul</h2>
-      <p class="text-sm text-gray-500 mt-1">Identifikasi di mana siswa mulai berhenti belajar.</p>
+      <h2 class="text-lg font-bold text-gray-800">Kategori Populer</h2>
+      <p class="text-sm text-gray-500 mt-1">Distribusi siswa berdasarkan kategori kursus Anda.</p>
     </div>
     <div class="h-64">
-      <Bar :data="chartData" :options="chartOptions" />
-    </div>
-    <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-3">
-      <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-        !
-      </div>
-      <div>
-        <p class="text-xs font-bold text-amber-800">Insight Mentor</p>
-        <p class="text-[11px] text-amber-700 leading-relaxed font-medium mt-0.5">
-          Terjadi penurunan signifikan (46%) pada Modul 4. Pertimbangkan untuk menyederhanakan materi atau menambahkan video penjelasan tambahan di bagian tersebut.
-        </p>
+      <Bar v-if="categories.length" :data="chartData" :options="chartOptions" />
+      <div v-else class="h-full flex items-center justify-center text-gray-400 italic text-sm">
+        Belum ada data kategori
       </div>
     </div>
   </div>
 </template>
+

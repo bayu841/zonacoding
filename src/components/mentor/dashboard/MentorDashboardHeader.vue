@@ -1,38 +1,45 @@
 <script setup>
 import StatCard from '../../../components/admin/dashboard/StatCard.vue'
 import { Users, BookOpen, Star, DollarSign } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { computed } from 'vue'
 
-const stats = ref([
+const props = defineProps({
+  statsData: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const stats = computed(() => [
   {
     title: 'Siswa Terdaftar',
-    value: '350',
+    value: props.statsData?.siswa_terdaftar?.toLocaleString() || '0',
     icon: Users,
-    change: '+15%',
+    change: '',
     isPositive: true,
     color: 'emerald'
   },
   {
     title: 'Kursus Saya',
-    value: '8',
+    value: props.statsData?.kursus_saya?.toLocaleString() || '0',
     icon: BookOpen,
-    change: '+1',
+    change: '',
     isPositive: true,
     color: 'blue'
   },
   {
     title: 'Rata-rata Rating',
-    value: '4.8',
+    value: props.statsData?.rata_rating?.toFixed(1) || '0.0',
     icon: Star,
-    change: '+0.2',
+    change: '',
     isPositive: true,
     color: 'amber'
   },
   {
-    title: 'Pendapatan (Bulan ini)',
-    value: 'Rp 12,5 jt',
+    title: 'Pendapatan (Total)',
+    value: `Rp ${props.statsData?.pendapatan?.toLocaleString() || '0'}`,
     icon: DollarSign,
-    change: '+22%',
+    change: '',
     isPositive: true,
     color: 'purple'
   }
@@ -53,3 +60,4 @@ const stats = ref([
     />
   </div>
 </template>
+
