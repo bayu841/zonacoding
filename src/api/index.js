@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getCookie, removeCookie } from "../utils/cookies";
+import { useAuthStore } from "@/stores/authStore";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -34,7 +35,6 @@ api.interceptors.response.use(
 
       // Clear pinia auth store to trigger router guard
       try {
-        const { useAuthStore } = require("@/stores/authStore");
         const authStore = useAuthStore();
         authStore.clearAuth();
       } catch (e) {

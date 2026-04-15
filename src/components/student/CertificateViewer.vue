@@ -1,13 +1,52 @@
 <script setup>
+import { ref } from "vue";
 import { Award, DownloadCloud } from "lucide-vue-next";
 import BaseModal from "../shared/BaseModal.vue";
+import { downloadCertificate } from "@/api/course";
+import { useAlert } from "../../composables/useAlert";
 
-defineProps({
+const { showAlert } = useAlert();
+const isDownloading = ref(false);
+
+const props = defineProps({
   isOpen: { type: Boolean, required: true },
   cert: { type: Object, default: null },
 });
 
-const emit = defineEmits(["close", "download"]);
+const emit = defineEmits(["close"]);
+
+const handleDownload = async () => {
+  console.log("Certificate object:", props.cert);
+  console.log("Certificate ID:", props.cert?.id);
+  
+  if (!props.cert?.id) {
+    showAlert("error", "ID Sertifikat tidak ditemukan");
+    return;
+  }
+
+  isDownloading.value = true;
+  try {
+    const response = await downloadCertificate(props.cert.id);
+    console.log("Download response:", response);
+
+    // Create blob link and trigger download
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${props.cert.credentialID || "certificate"}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    showAlert("success", "PDF sertifikat berhasil diunduh");
+  } catch (err) {
+    console.error("Download failed:", err);
+    showAlert("error", "Gagal mengunduh sertifikat");
+  } finally {
+    isDownloading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -60,7 +99,7 @@ const emit = defineEmits(["close", "download"]);
         <p
           class="font-serif text-4xl md:text-6xl text-indigo-700 italic border-b-2 border-indigo-200/50 px-16 pb-2 mb-8 relative z-10"
         >
-          Student User
+          {{ cert.studentName }}
         </p>
         <p class="text-sm md:text-base text-gray-500 mb-2 relative z-10">
           Atas kelulusannya dalam menyelesaikan kelas
@@ -114,10 +153,12 @@ const emit = defineEmits(["close", "download"]);
           Batal
         </button>
         <button
-          @click="emit('download')"
-          class="flex items-center justify-center flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors shadow-sm"
+          @click="handleDownload"
+          :disabled="isDownloading"
+          class="flex items-center justify-center flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <DownloadCloud class="w-5 h-5 mr-3" /> Unduh PDF Resolusi Tinggi
+          <DownloadCloud class="w-5 h-5 mr-3" />
+          {{ isDownloading ? "Mengunduh..." : "Unduh PDF Resolusi Tinggi" }}
         </button>
       </div>
     </div>

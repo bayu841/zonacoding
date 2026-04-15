@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 import {
   LayoutDashboard,
   Compass,
@@ -14,9 +14,9 @@ import {
   X,
 } from "lucide-vue-next";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
 // State
 const isSidebarOpen = ref(true);
@@ -61,11 +61,12 @@ const toggleDropdown = () => {
 };
 
 const handleLogout = async () => {
-  showDropdown.value = false
-  closeMobileDrawer()
-  await authStore.logout()
-  router.push('/')
-}
+  showDropdown.value = false;
+  closeMobileDrawer();
+  await authStore.logout();
+  // Redirect to home page
+  router.push("/login");
+};
 
 const isActiveRoute = (item) => {
   if (item.exact) {
@@ -216,10 +217,12 @@ const isActiveRoute = (item) => {
             <div
               class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(79,70,229,0.3)] ring-2 ring-white/80 group-hover:ring-indigo-200 transition-all"
             >
-              {{ authStore.user?.name?.charAt(0).toUpperCase() || 'U' }}
+              {{ authStore.user?.name?.charAt(0).toUpperCase() || "U" }}
             </div>
             <div class="hidden sm:block text-left ml-1">
-              <p class="text-sm font-semibold text-gray-700 leading-tight">{{ authStore.user?.name || 'Student User' }}</p>
+              <p class="text-sm font-semibold text-gray-700 leading-tight">
+                {{ authStore.user?.name || "Student User" }}
+              </p>
               <p class="text-xs text-indigo-600 font-medium">Level 12</p>
             </div>
           </button>

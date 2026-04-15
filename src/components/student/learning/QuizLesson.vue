@@ -38,7 +38,12 @@ const quizContainer = ref(null)
 const scrollContainer = ref(null)
 const lines = ref([]) 
 
-const questions = computed(() => props.lesson.quizData || [])
+const questions = computed(() => {
+  const qs = props.lesson.quizData?.questions || [];
+  console.log("Quiz Data available:", !!props.lesson.quizData);
+  console.log("Questions:", qs);
+  return qs;
+})
 const currentQuestion = computed(() => questions.value[currentQuestionIdx.value])
 const progress = computed(() => ((currentQuestionIdx.value + 1) / questions.value.length) * 100)
 const finalScorePercentage = computed(() => Math.round((score.value / questions.value.length) * 100))
@@ -232,7 +237,7 @@ onMounted(() => {
       <!-- THE SCROLLABLE CONTENT -->
       <div class="flex-1 overflow-y-auto relative custom-scrollbar" ref="scrollContainer">
         <!-- THE SVG (Moves with content) -->
-        <svg v-if="currentQuestion.type === 'matching'" class="absolute top-0 left-0 w-full pointer-events-none z-0 overflow-visible" 
+        <svg v-if="currentQuestion && currentQuestion.type === 'matching'" class="absolute top-0 left-0 w-full pointer-events-none z-0 overflow-visible" 
              style="height: 2000px;">
           <defs>
              <filter id="ropeShadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -261,16 +266,19 @@ onMounted(() => {
         </svg>
 
         <div class="max-w-3xl mx-auto py-10 px-6 space-y-10 relative z-10 pb-20">
-          <div class="space-y-4">
+          <div v-if="currentQuestion" class="space-y-4">
               <h3 class="text-3xl md:text-3xl font-black text-gray-900 leading-tight tracking-tight">{{ currentQuestion.text }}</h3>
               <p class="text-gray-500 font-bold text-sm flex items-center gap-2 italic">
                   <Info class="w-5 h-5 text-indigo-300" />
                   {{ currentQuestion.type === 'matching' ? 'Tarik garis imajiner dengan mengklik kotak di kiri lalu di kanan.' : 'Pilih jawaban yang paling benar.' }}
               </p>
           </div>
+          <div v-else class="py-20 text-center">
+            <p class="text-gray-500 font-medium">Loading soal...</p>
+          </div>
 
           <!-- Multiple Choice -->
-          <div v-if="currentQuestion.type === 'multiple-choice' || !currentQuestion.type" class="grid gap-4">
+          <div v-if="currentQuestion && (currentQuestion.type === 'multiple-choice' || !currentQuestion.type)" class="grid gap-4">
               <button v-for="(opt, idx) in currentQuestion.options" :key="idx" @click="selectOption(idx)"
                 class="p-4 rounded-xl border-2 text-left transition-all active:scale-[0.99]"
                 :class="selectedOption === null 
@@ -287,7 +295,7 @@ onMounted(() => {
           </div>
 
           <!-- Matching -->
-          <div v-else-if="currentQuestion.type === 'matching'" class="grid grid-cols-2 gap-x-8 md:gap-x-24 lg:gap-x-40 gap-y-4 md:gap-y-6 pt-6">
+          <div v-if="currentQuestion && currentQuestion.type === 'matching'" class="grid grid-cols-2 gap-x-8 md:gap-x-24 lg:gap-x-40 gap-y-4 md:gap-y-6 pt-6">
             <div class="space-y-4 md:space-y-6">
               <button v-for="item in currentQuestion.leftItems" :key="item.id" :data-match-left="item.id" @click="selectLeft(item.id)"
                 class="w-full p-4 md:p-5 rounded-2xl border-2 text-left font-bold text-xs md:text-sm transition-all relative z-40"
@@ -319,7 +327,7 @@ onMounted(() => {
 
       <!-- Navigation -->
       <div class="px-8 py-6 border-t border-gray-100 flex justify-end bg-white z-[60]">
-        <button v-if="(currentQuestion.type !== 'matching' && selectedOption !== null) || (currentQuestion.type === 'matching' && Object.keys(matchingPairs).length === currentQuestion.leftItems.length)"
+        <button v-if="currentQuestion && ((currentQuestion.type !== 'matching' && selectedOption !== null) || (currentQuestion.type === 'matching' && Object.keys(matchingPairs).length === currentQuestion.leftItems.length))"
           @click="handleNext" 
           class="px-8 py-3 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-md flex items-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all">
           {{ currentQuestionIdx === questions.length - 1 ? 'SELESAIKAN' : 'LANJUTKAN' }}

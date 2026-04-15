@@ -107,6 +107,7 @@ export const getMyCourses = async () => {
 export const getLessons = async (courseId) => {
   try {
     const response = await API.get(`/courses/${courseId}/lessons`);
+    // Response structure: { success, message, data: { data: [...], unrelated_quizzes: [...] } }
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error;
@@ -122,14 +123,7 @@ export const getTasks = async (courseId) => {
   }
 };
 
-export const getQuizzes = async (courseId) => {
-  try {
-    const response = await API.get(`/courses/${courseId}/quizzes/student`);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : error;
-  }
-};
+
 
 export const submitQuiz = async (quizId, answers) => {
   try {
@@ -158,13 +152,15 @@ export const markLessonComplete = async (lessonId) => {
   }
 };
 
-export const updateLessonProgress = async (lessonId) => {
-  try {
-    const response = await API.get(`/lessons/${lessonId}/progress`);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : error;
-  }
+export const updateLessonProgress = (lesson) => {
+  // Progress is now embedded in lesson object from /courses/${courseId}/lessons
+  // Simply return the progress data from the lesson
+  return {
+    data: {
+      progress: lesson.progress || null,
+      duration: lesson.duration_in_minutes || 0,
+    }
+  };
 };
 
 export const getMyCertificates = async () => {
@@ -173,5 +169,73 @@ export const getMyCertificates = async () => {
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error;
+  }
+};
+
+export const downloadCertificate = async (certificateId) => {
+  try {
+    console.log("Downloading certificate with ID:", certificateId);
+    const response = await API.get(`/certificates/${certificateId}/download`, {
+      responseType: 'blob'
+    });
+    console.log("Response received:", response);
+    return response;
+  } catch (error) {
+    console.error("Download error details:", error);
+    throw error;
+  }
+};
+
+export const getCertificateByCourseId = async (courseId) => {
+  try {
+    console.log("Getting certificate for course ID:", courseId);
+    const response = await API.get(`/courses/${courseId}/certificate`);
+    console.log("Certificate response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Get certificate error details:", error);
+    throw error;
+  }
+};
+
+export const getCourseLessonsWithProgress = async (courseId) => {
+  try {
+    // Single endpoint call to get all course content and progress data
+    const response = await API.get(`/courses/${courseId}/lessons`);
+    // Response structure: { success, message, data: { data: [...lessons], course_progress: 50, unrelated_quizzes: [...] } }
+    
+    const responseData = response.data?.data || {};
+    const lessonsData = responseData.data || [];
+    const unrelatedQuizzes = responseData.unrelated_quizzes || [];
+    const courseProgress = responseData.course_progress || 0;
+    
+    // Extract completed lesson IDs (lessons with progress === 100)
+    const completedLessons = lessonsData
+      .filter(lesson => lesson.progress === 100)
+      .map(lesson => lesson.id);
+    
+    // Extract embedded quizzes from lessons
+    const embeddedQuizzes = lessonsData.flatMap(lesson => lesson.quizzes || []);
+    
+    return {
+      data: {
+        lessons: lessonsData,
+        embeddedQuizzes: embeddedQuizzes,
+        unrelatedQuizzes: unrelatedQuizzes,
+        courseProgress: courseProgress,
+        completedLessons: completedLessons
+      }
+    };
+  } catch (error) {
+    console.error("Get course lessons with progress error:", error);
+    return {
+      data: {
+        lessons: [],
+        embeddedQuizzes: [],
+        unrelatedQuizzes: [],
+        courseProgress: 0,
+        completedLessons: []
+      }
+    };
   }
 };
