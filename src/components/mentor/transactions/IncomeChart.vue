@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -14,14 +15,25 @@ import {
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler)
 
-const chartData = {
+const props = defineProps({
+  data: {
+    type: Object,
+    default: null
+  },
+  percentageChange: {
+    type: String,
+    default: '+0%'
+  }
+})
+
+const defaultChartData = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
   datasets: [
     {
-      label: 'Pendapatan (Juta IDR)',
+      label: 'Pendapatan',
       backgroundColor: 'rgba(99, 102, 241, 0.1)',
       borderColor: '#6366f1',
-      data: [4.5, 6.2, 3.8, 8.5, 7.2, 12.5],
+      data: [0, 0, 0, 0, 0, 0],
       fill: true,
       tension: 0.4,
       pointRadius: 4,
@@ -31,12 +43,22 @@ const chartData = {
   ]
 }
 
+const displayData = computed(() => {
+  if (props.data) return props.data
+  return defaultChartData
+})
+
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
       display: false
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => `Rp ${context.parsed.y.toLocaleString('id-ID')}`
+      }
     }
   },
   scales: {
@@ -44,6 +66,9 @@ const chartOptions = {
       beginAtZero: true,
       grid: {
         color: 'rgba(0, 0, 0, 0.05)',
+      },
+      ticks: {
+        callback: (value) => `Rp ${value.toLocaleString('id-ID')}`
       }
     },
     x: {
@@ -64,7 +89,7 @@ const chartOptions = {
       </div>
     </div>
     <div class="flex-1 min-h-[160px]">
-      <Line :data="chartData" :options="chartOptions" />
+      <Line v-if="displayData && displayData.labels" :data="displayData" :options="chartOptions" />
     </div>
   </div>
 </template>

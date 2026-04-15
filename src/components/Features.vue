@@ -1,11 +1,13 @@
 <script setup>
 import { BookOpen, Zap, Target, Code2, LineChart, Award } from "lucide-vue-next";
+import { useImage } from "@/composables/useImage";
+const { getProxyUrl, handleImageError } = useImage();
 </script>
 
 <template>
   <!-- PATTERN TOP -->
   <div class="flex justify-end">
-  <img src="../assets/images/pattern6.webp" alt="" class="w-[180px] ">
+  <img src="../assets/images/pattern6.webp" alt="" class="w-[180px] " @error="handleImageError">
   </div>
 
   <section class="text-center px-6 mb-16">
@@ -88,5 +90,5 @@ import { BookOpen, Zap, Target, Code2, LineChart, Award } from "lucide-vue-next"
 
     </div>
 </section>
-  <img src="../assets/images/pattern7.webp" alt="" class="w-[100px] float mb-2 ml-3 ">
+  <img src="../assets/images/pattern7.webp" alt="" class="w-[100px] float mb-2 ml-3 " @error="handleImageError">
 </template>

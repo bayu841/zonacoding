@@ -1,5 +1,8 @@
 <script setup>
 import GlareHover from "../GlareHover.vue";
+import { useImage } from "@/composables/useImage";
+
+const { getProxyUrl, handleImageError } = useImage();
 </script>
 
 <template>
@@ -25,6 +28,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -67,6 +71,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -109,6 +114,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -151,6 +157,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -193,6 +200,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -235,6 +243,7 @@ import GlareHover from "../GlareHover.vue";
           src="../../assets/images/news/newsimg.webp" 
           alt="HTML"
           class="w-full h-48 object-cover transition duration-500 "
+          @error="handleImageError"
         >
       </div>
 
@@ -266,6 +275,7 @@ import GlareHover from "../GlareHover.vue";
     src="../../assets/images/pattern3.png" 
     alt="" 
     class="w-[200px] opacity-60 rotate-[12deg] ml-10"
+    @error="handleImageError"
   />
 
 </div>

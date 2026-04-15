@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from "vue";
+import { useImage } from "@/composables/useImage";
 
 const isOpen = ref(false);
+const { getProxyUrl, handleImageError } = useImage();
 </script>
 
 <template>
@@ -9,8 +11,8 @@ const isOpen = ref(false);
     <div class="flex justify-between items-center px-6 py-4">
 
       <!-- Logo -->
-    <img src="../assets/images/logo.webp" alt=""
-    class="w-10">
+    <img src="../assets/images/logo.webp" alt="NextSkill"
+    class="w-10" @error="handleImageError">
 
       <!-- Menu Desktop -->
       <ul class="hidden md:flex gap-8 text-gray-700 font-medium">

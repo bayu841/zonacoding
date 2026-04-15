@@ -21,7 +21,7 @@ const searchQuery = ref('')
 const filteredMentors = computed(() => {
   return mentors.value.filter(mentor => {
     const matchesStatus = filterStatus.value === 'all' || mentor.status === filterStatus.value
-    const matchesSearch = mentor.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
+    const matchesSearch = mentor.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                           mentor.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     return matchesStatus && matchesSearch
   })

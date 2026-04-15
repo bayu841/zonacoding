@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 import {
   LayoutDashboard,
   Users,
@@ -18,6 +19,7 @@ import {
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 
 // State untuk sidebar desktop (expanded/collapsed)
 const isSidebarOpen = ref(true)
@@ -46,6 +48,7 @@ const navigationGroups = [
     title: 'Sistem',
     items: [
       { name: 'Transaksi', to: '/admin/transactions', icon: Receipt },
+      { name: 'Penarikan Mentor', to: '/admin/withdrawals', icon: Receipt },
       { name: 'Pengaturan', to: '/admin/settings', icon: Settings }
     ]
   }
@@ -65,9 +68,10 @@ const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
   showDropdown.value = false
   closeMobileDrawer()
+  await authStore.logout()
   router.push('/')
 }
 
@@ -210,7 +214,7 @@ const isActiveRoute = (item) => {
             <div
               class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-semibold text-sm shadow-[0_2px_8px_rgba(59,130,246,0.2)] ring-2 ring-white/80 group-hover:ring-blue-200 transition-all"
             >
-              A
+              {{ authStore.user?.name?.charAt(0).toUpperCase() || 'A' }}
             </div>
           </button>
 
@@ -227,6 +231,14 @@ const isActiveRoute = (item) => {
               v-if="showDropdown"
               class="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] border border-gray-200/60 py-1 z-50"
             >
+              <router-link
+                to="/admin/settings"
+                class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors rounded-lg mx-1"
+                @click="showDropdown = false"
+              >
+                <Settings class="w-4 h-4 mr-3" />
+                Pengaturan
+              </router-link>
               <button
                 @click="handleLogout"
                 class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors rounded-lg mx-1"

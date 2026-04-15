@@ -1,14 +1,40 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { computed } from 'vue'
 
 const router = useRouter()
 
-const recentStudents = [
-  { id: 1, name: 'Budi Santoso', course: 'Membuat Website dengan...', initials: 'B', color: 'emerald', time: 'Baru Saja' },
-  { id: 2, name: 'Andi Suryono', course: 'Membuat Website dengan...', initials: 'A', color: 'blue', time: '2 jam lalu' },
-  { id: 3, name: 'Siti Rahma', course: 'Tailwind CSS dari Nol', initials: 'S', color: 'purple', time: 'Kemarin' },
-  { id: 4, name: 'Dewi Lestari', course: 'Tailwind CSS dari Nol', initials: 'D', color: 'amber', time: 'Kemarin' }
-]
+const props = defineProps({
+  students: {
+    type: Array,
+    default: () => []
+  }
+})
+
+// Map raw student data to UI format
+const recentStudents = computed(() => {
+  return props.students.slice(0, 5).map(s => ({
+    id: s.id,
+    name: s.student_name,
+    course: s.course_title,
+    initials: s.student_name ? s.student_name.charAt(0).toUpperCase() : '?',
+    color: ['emerald', 'blue', 'purple', 'amber', 'rose'][s.id % 5] || 'emerald',
+    time: formatDate(s.enrolled_at)
+  }))
+})
+
+function formatDate(dateString) {
+  if (!dateString) return 'Baru Saja'
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
+  
+  if (diffInHours < 24) {
+    if (diffInHours === 0) return 'Baru Saja'
+    return `${diffInHours} jam lalu`
+  }
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+}
 </script>
 
 <template>

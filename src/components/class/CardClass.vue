@@ -1,6 +1,9 @@
 <script setup>
 import ShinyText from "../ShinyText.vue";
 import GlareHover from "../GlareHover.vue";
+import { useImage } from "@/composables/useImage";
+
+const { getProxyUrl, handleImageError } = useImage();
 </script>
 
 <template>
@@ -138,7 +141,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->
@@ -172,7 +175,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2 ">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->
@@ -206,7 +209,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->
@@ -240,7 +243,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->
@@ -274,7 +277,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->
@@ -308,7 +311,7 @@ import GlareHover from "../GlareHover.vue";
         
         <!-- Icon -->
         <div class="w-14 h-14 mb-4 flex items-center justify-center rounded-lg bg-orange-100 p-2">
-        <img src="../../assets/images/html.png" alt="HTML Icon">
+        <img src="../../assets/images/html.png" alt="HTML Icon" @error="handleImageError">
         </div>
 
         <!-- Title -->

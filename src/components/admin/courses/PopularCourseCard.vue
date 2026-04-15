@@ -1,5 +1,6 @@
 <script setup>
 import { Star, TrendingUp, Users2, PlayCircle } from 'lucide-vue-next'
+import { useImage } from '@/composables/useImage'
 
 defineProps({
   id: Number,
@@ -12,17 +13,24 @@ defineProps({
   level: String,
   trend: String
 })
+
+const { getProxyUrl, handleImageError, isEmoji } = useImage()
 </script>
 
 <template>
   <div
     class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
   >
-    <div class="relative h-40 overflow-hidden">
+    <div class="relative h-40 overflow-hidden bg-gray-100 flex items-center justify-center">
+      <template v-if="image && isEmoji(image)">
+        <span class="text-6xl">{{ image.includes('/storage/') ? image.split('/').pop() : image }}</span>
+      </template>
       <img
-        :src="image"
+        v-else
+        :src="getProxyUrl(image)"
         :alt="title"
         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        @error="handleImageError"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 

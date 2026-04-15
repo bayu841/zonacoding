@@ -34,7 +34,6 @@ const getStatusIcon = (status) => {
             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kontak</th>
             <th scope="col" class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Kursus</th>
             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status Verifikasi</th>
-            <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -76,15 +75,7 @@ const getStatusIcon = (status) => {
                 {{ mentor.status }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button 
-                @click="$emit('view-detail', mentor)"
-                class="inline-flex items-center gap-2 px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200 group/btn"
-              >
-                <Eye class="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                Detail
-              </button>
-            </td>
+
           </tr>
           <!-- Empty State -->
           <tr v-if="mentors.length === 0">

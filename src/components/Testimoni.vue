@@ -1,3 +1,8 @@
+<script setup>
+import { useImage } from '@/composables/useImage'
+const { getProxyUrl, handleImageError } = useImage()
+</script>
+
 <template>
   <section class="py-16 bg-[url('/src/assets/images/testimoni.webp')] bg-cover bg-center p-5 md:p-20 mt-5">
     
@@ -23,7 +28,7 @@
         <!-- Card 1 -->
         <div class="bg-white/80 backdrop-blur p-5 rounded-xl shadow hover:shadow-lg transition">
           <div class="flex items-center gap-3 mb-3">
-            <img src="https://i.pravatar.cc/40?img=1" class="w-10 h-10 rounded-full" />
+            <img :src="getProxyUrl('https://i.pravatar.cc/40?img=' + (index + 1))" class="w-10 h-10 rounded-full" @error="handleImageError" />
             <div>
               <p class="font-semibold text-sm">Andi</p>
               <p class="text-xs text-gray-500">Mahasiswa</p>

@@ -1,23 +1,61 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Users, Search, Filter } from 'lucide-vue-next'
 import StudentListTable from '../../../components/mentor/students/StudentListTable.vue'
 import BaseModal from '../../../components/shared/BaseModal.vue'
+import { getMentorStudents } from '@/api/mentorStudents'
 
 const isMessageModalOpen = ref(false)
 const selectedStudent = ref(null)
 const messageText = ref('')
 const isSuccessModalOpen = ref(false)
+const loading = ref(false)
 
 const searchQuery = ref('')
 const filterCategory = ref('all')
-const students = ref([
-  { id: 1, name: 'Andi Suryono', email: 'andi@example.com', course: 'Membuat Website dengan HTML & CSS', category: 'Frontend', progress: 80, joinDate: '12 Apr 2024' },
-  { id: 2, name: 'Siti Rahma', email: 'siti@example.com', course: 'Tailwind CSS dari Nol', category: 'Frontend', progress: 45, joinDate: '15 Apr 2024' },
-  { id: 3, name: 'Budi Santoso', email: 'budi@example.com', course: 'Membuat Website dengan HTML & CSS', category: 'Frontend', progress: 100, joinDate: '01 Mar 2024' },
-  { id: 4, name: 'Dewi Lestari', email: 'dewi@example.com', course: 'Tailwind CSS dari Nol', category: 'Frontend', progress: 12, joinDate: '02 Mei 2024' },
-  { id: 5, name: 'Kevin Anggara', email: 'kevin@example.com', course: 'Membuat Website dengan HTML & CSS', category: 'Frontend', progress: 65, joinDate: '10 Mei 2024' }
-])
+const students = ref([])
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const fetchStudents = async () => {
+  loading.value = true
+  try {
+    const res = await getMentorStudents()
+    if (res.status) {
+      students.value = res.data.students.map(s => ({
+        id: s.id,
+        name: s.student_name,
+        email: s.student_email,
+        course: s.course_title,
+        category: s.category_name,
+        progress: s.progress_percentage,
+        joinDate: formatDate(s.enrolled_at),
+        status: s.status
+      }))
+    }
+  } catch (err) {
+    console.error('Fetch students error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchStudents()
+})
+
+const categories = computed(() => {
+  const cats = new Set(students.value.map(s => s.category))
+  return ['all', ...Array.from(cats)].filter(Boolean)
+})
 
 const filteredStudents = computed(() => {
   let result = students.value
@@ -74,35 +112,42 @@ const sendMessage = () => {
         <div class="flex gap-3 w-full md:w-auto">
           <select 
             v-model="filterCategory"
-            class="flex-1 md:flex-none appearance-none outline-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-600 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-all text-sm font-medium cursor-pointer"
+            class="flex-1 md:flex-none appearance-none outline-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-600 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-all text-sm font-medium cursor-pointer min-w-[160px]"
           >
-            <option value="all">Semua Kategori</option>
-            <option value="frontend">Frontend</option>
-            <option value="backend">Backend</option>
-            <option value="design">Design</option>
+            <option v-for="cat in categories" :key="cat" :value="cat">
+              {{ cat === 'all' ? 'Semua Kategori' : cat }}
+            </option>
           </select>
         </div>
       </div>
     </div>
 
-    <!-- List Component / Default Empty State -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
-      <StudentListTable
-        v-if="filteredStudents.length > 0"
-        :students="filteredStudents"
-        @show-options="(student) => {
-          selectedStudent = student;
-          isMessageModalOpen = true;
-        }"
-      />
-
-      <div v-else class="p-16 text-center">
-        <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
-          <Users class="w-8 h-8 text-emerald-600" />
-        </div>
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Siswa tidak ditemukan</h3>
-        <p class="text-gray-500 max-w-sm mx-auto">Coba cari dengan kata kunci lain atau Anda memang belum memiliki siswa.</p>
+    <!-- List Component / Default States -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden min-h-[400px]">
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-32">
+        <div class="w-12 h-12 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-500 font-bold animate-pulse">Memuat data siswa...</p>
       </div>
+
+      <template v-else>
+        <StudentListTable
+          v-if="filteredStudents.length > 0"
+          :students="filteredStudents"
+          @show-options="(student) => {
+            selectedStudent = student;
+            isMessageModalOpen = true;
+          }"
+        />
+
+        <div v-else class="p-16 text-center">
+          <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
+            <Users class="w-8 h-8 text-emerald-600" />
+          </div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Siswa tidak ditemukan</h3>
+          <p class="text-gray-500 max-w-sm mx-auto">Coba cari dengan kata kunci lain atau Anda memang belum memiliki siswa.</p>
+        </div>
+      </template>
     </div>
 
     <!-- Message Composer Modal -->

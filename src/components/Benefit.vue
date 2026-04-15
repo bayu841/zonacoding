@@ -1,9 +1,11 @@
 <script setup>
+import { useImage } from '@/composables/useImage'
+const { getProxyUrl, handleImageError } = useImage()
 </script>
 
 <template>
   <div class="flex justify-end">
-  <img src="../assets/images/pattern4.webp" alt="" class="w-16 mr-20 mt-10 spin">
+  <img src="../assets/images/pattern4.webp" alt="" class="w-16 mr-20 mt-10 spin" @error="handleImageError">
   </div>
   <section 
     class="px-4 md:px-6 transition-all duration-500 mb-10"
@@ -16,6 +18,7 @@
           src="../assets/images/classhero.webp"
           alt="About Image"
           class="w-full max-w-xs sm:max-w-sm md:max-w-sm float"
+          @error="handleImageError"
         />
       </div>
 
@@ -58,5 +61,5 @@
       </div>
     </div>
   </section>
-  <img src="../assets/images/pattern5.webp" alt="" class="w-16 ml-20 float">
+  <img src="../assets/images/pattern5.webp" alt="" class="w-16 ml-20 float" @error="handleImageError">
 </template>

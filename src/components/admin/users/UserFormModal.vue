@@ -109,10 +109,11 @@ const submitForm = () => {
         </button>
         <button
           @click="submitForm"
-          class="flex-1 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          class="flex-1 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
           {{ mode === 'create' ? 'Tambah Pengguna' : 'Simpan Perubahan' }}
         </button>
+
       </div>
     </div>
   </div>

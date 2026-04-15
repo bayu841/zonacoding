@@ -1,5 +1,5 @@
 <script setup>
-import { Search, Filter, UserCheck, Plus } from 'lucide-vue-next'
+import { Search, Filter, UserCheck, Plus, GraduationCap } from 'lucide-vue-next'
 
 defineProps({
   searchQuery: String,
@@ -22,10 +22,10 @@ defineEmits(['update:searchQuery', 'update:filterStatus'])
       </div>
       <router-link
         to="/admin/mentors/verification"
-        class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 font-medium py-2.5 px-5 rounded-xl shadow-sm transition-all duration-200"
+        class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-xl shadow-lg shadow-indigo-100 transition-all duration-200 active:scale-95"
       >
         <UserCheck class="w-4 h-4" />
-        Permintaan Verifikasi
+        Verifikasi Mentor
       </router-link>
     </div>
 

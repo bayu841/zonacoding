@@ -52,9 +52,9 @@ defineEmits(['update:searchQuery', 'update:filterStatus', 'export'])
             class="w-full appearance-none pl-4 pr-9 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 shadow-sm cursor-pointer"
           >
             <option value="all">Semua Status</option>
-            <option value="Sukses">Sukses</option>
-            <option value="Pending">Pending</option>
-            <option value="Gagal">Gagal</option>
+            <option value="success">Sukses</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Gagal</option>
           </select>
           <Filter class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>

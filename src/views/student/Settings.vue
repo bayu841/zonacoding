@@ -1,27 +1,57 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Save } from 'lucide-vue-next'
 import BaseModal from '../../components/shared/BaseModal.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { updateUser } from '@/api/user'
+import { useAlert } from '@/composables/useAlert'
 
+const authStore = useAuthStore()
+const { showAlert } = useAlert()
 const isModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
+const isSaving = ref(false)
 
 const profile = ref({
-  name: 'Student User',
-  email: 'student@example.com',
-  phone: '08123456789',
-  bio: 'Saya sangat tertarik belajar pemrograman frontend, khususnya Vue.js dan React. Saya sedang mencari peluang magang.'
+  name: '',
+  email: '',
+  phone: '',
+  bio: ''
+})
+
+onMounted(() => {
+  if (authStore.user) {
+    profile.value = {
+      name: authStore.user.name || '',
+      email: authStore.user.email || '',
+      phone: authStore.user.phone || '',
+      bio: authStore.user.bio || ''
+    }
+  }
 })
 
 const handleSave = () => {
   isModalOpen.value = true
 }
 
-const confirmSave = () => {
+const confirmSave = async () => {
   isModalOpen.value = false
-  setTimeout(() => {
-    isSuccessModalOpen.value = true
-  }, 300)
+  isSaving.value = true
+  try {
+    const payload = {
+      ...profile.value,
+      role: authStore.user.role
+    }
+    const response = await updateUser(authStore.user.id, payload)
+    if (response) {
+      authStore.updateUser(profile.value)
+      isSuccessModalOpen.value = true
+    }
+  } catch (err) {
+    showAlert('Gagal', err.message || 'Gagal memperbarui profil.', 'error')
+  } finally {
+    isSaving.value = false
+  }
 }
 </script>
 
@@ -34,7 +64,7 @@ const confirmSave = () => {
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
       <div class="p-6 md:p-8 space-y-6">
-        
+
         <!-- Avatar Section -->
         <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
           <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-3xl shadow-lg ring-4 ring-indigo-50">
@@ -56,7 +86,7 @@ const confirmSave = () => {
             <label class="text-sm font-semibold text-gray-700">Nama Lengkap</label>
             <input v-model="profile.name" type="text" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm" />
           </div>
-          
+
           <div class="space-y-1.5">
             <label class="text-sm font-semibold text-gray-700">Email Utama</label>
             <input v-model="profile.email" type="email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm" />
@@ -74,7 +104,7 @@ const confirmSave = () => {
           </div>
         </div>
       </div>
-      
+
       <!-- Footer Actions -->
       <div class="p-6 bg-gray-50/80 border-t border-gray-100 flex justify-end gap-3">
         <button class="px-6 py-2.5 bg-white text-gray-600 font-bold rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">Batal</button>
@@ -86,7 +116,7 @@ const confirmSave = () => {
     </div>
 
     <!-- Modals -->
-    <BaseModal 
+    <BaseModal
       :is-open="isModalOpen"
       @close="isModalOpen = false"
       @confirm="confirmSave"
@@ -98,7 +128,7 @@ const confirmSave = () => {
       showCancel
     />
 
-    <BaseModal 
+    <BaseModal
       :is-open="isSuccessModalOpen"
       @close="isSuccessModalOpen = false"
       @confirm="isSuccessModalOpen = false"

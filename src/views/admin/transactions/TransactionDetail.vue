@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { 
   ArrowLeft, 
   Download, 
@@ -19,51 +19,64 @@ import {
   AlertCircle,
   ExternalLink
 } from 'lucide-vue-next'
+import { getTransaction, downloadTransactionReport } from '@/api/transaction'
+import { useAlert } from '@/composables/useAlert'
 
 const route = useRoute()
 const router = useRouter()
+const { showAlert } = useAlert()
 const transactionId = route.params.transactionId
 
-const transaction = ref({
-  id: 'INV-1001',
-  investmentId: transactionId,
-  user: 'Alif Naufal',
-  email: 'alif@example.com',
-  course: 'Mastering Vue 3: Architecture & Design Patterns',
-  instructor: 'Andi Setiawan',
-  amount: 250000,
-  tax: 25000,
-  total: 275000,
-  paymentMethod: 'Credit Card Visa (**** 4242)',
-  status: 'Sukses',
-  date: '10 April 2026',
-  time: '14:30:45',
-  description: 'Pembelian akses seumur hidup untuk kursus Mastering Vue 3 tingkat lanjut.',
-  notes: 'Pembayaran berhasil dikonfirmasi secara otomatis oleh sistem Stripe.'
+const transaction = ref(null)
+const loading = ref(true)
+
+const fetchDetail = async () => {
+  loading.value = true
+  try {
+    const response = await getTransaction(transactionId)
+    // response is { status: true, data: { ... } }
+    transaction.value = response.data
+  } catch (err) {
+    showAlert('Gagal', 'Gagal memuat detail transaksi.', 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchDetail()
 })
 
 const getStatusTheme = (status) => {
+  const s = status ? status.toLowerCase() : 'pending'
   const themes = {
-    Sukses: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20',
-    Pending: 'bg-amber-50 text-amber-700 border-amber-200 ring-amber-500/20',
-    Gagal: 'bg-red-50 text-red-700 border-red-200 ring-red-500/20'
+    success: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20',
+    pending: 'bg-amber-50 text-amber-700 border-amber-200 ring-amber-500/20',
+    failed: 'bg-red-50 text-red-700 border-red-200 ring-red-500/20',
+    expired: 'bg-gray-50 text-gray-700 border-gray-200 ring-gray-500/10'
   }
-  return themes[status] || 'bg-gray-50 text-gray-700 border-gray-200'
+  return themes[s] || 'bg-gray-50 text-gray-700 border-gray-200'
 }
 
 const getStatusIcon = (status) => {
-  if (status === 'Sukses') return CheckCircle2
-  if (status === 'Pending') return Clock
-  if (status === 'Gagal') return XCircle
+  const s = status ? status.toLowerCase() : 'pending'
+  if (s === 'success') return CheckCircle2
+  if (s === 'pending') return Clock
+  if (s === 'failed') return XCircle
   return AlertCircle
 }
 
-const downloadInvoice = () => {
-    alert('Menyiapkan file PDF Invoice ' + transaction.value.id)
+const downloadInvoice = async () => {
+  try {
+    await downloadTransactionReport()
+    showAlert('Berhasil', 'Invoice berhasil diunduh.', 'success')
+  } catch (err) {
+    showAlert('Gagal', 'Gagal mengunduh invoice.', 'error')
+  }
 }
 
 const sendReceipt = () => {
-    alert('Bukti pembayaran telah dikirim ke ' + transaction.value.email)
+    showAlert('Info', 'Bukti pembayaran telah dikirim ke ' + transaction.value?.customer?.email, 'success')
 }
 </script>
 
@@ -92,8 +105,14 @@ const sendReceipt = () => {
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-24 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
+      <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+      <p class="text-indigo-600 font-bold animate-pulse text-sm uppercase tracking-widest">Memuat Detail...</p>
+    </div>
+
     <!-- Main Invoice Container -->
-    <div class="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+    <div v-else-if="transaction" class="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
       <!-- Invoice Header -->
       <div class="px-8 py-10 bg-gray-50/50 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="space-y-2">
@@ -103,10 +122,10 @@ const sendReceipt = () => {
             </div>
             <h2 class="text-3xl font-black text-gray-900 tracking-tight">Invoice</h2>
           </div>
-          <p class="text-sm font-bold text-gray-400 uppercase tracking-widest pl-1">ID: {{ transaction.id }}</p>
+          <p class="text-sm font-bold text-gray-400 uppercase tracking-widest pl-1">ID: {{ transaction.invoice_number }}</p>
         </div>
         
-        <div :class="['inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black border ring-4 transition-all', getStatusTheme(transaction.status)]">
+        <div :class="['inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black border ring-4 transition-all capitalize', getStatusTheme(transaction.status)]">
           <component :is="getStatusIcon(transaction.status)" class="w-5 h-5" />
           {{ transaction.status }}
         </div>
@@ -124,7 +143,7 @@ const sendReceipt = () => {
                 </div>
                 <div>
                   <div class="text-[10px] font-bold text-gray-400 uppercase">Nama Lengkap</div>
-                  <div class="text-sm font-bold text-gray-900">{{ transaction.user }}</div>
+                  <div class="text-sm font-bold text-gray-900">{{ transaction.customer?.name }}</div>
                 </div>
               </div>
               <div class="flex items-center gap-3 group">
@@ -133,7 +152,7 @@ const sendReceipt = () => {
                 </div>
                 <div>
                   <div class="text-[10px] font-bold text-gray-400 uppercase">Email Address</div>
-                  <div class="text-sm font-bold text-gray-900">{{ transaction.email }}</div>
+                  <div class="text-sm font-bold text-gray-900">{{ transaction.customer?.email }}</div>
                 </div>
               </div>
             </div>
@@ -148,18 +167,18 @@ const sendReceipt = () => {
                 </div>
                 <div>
                   <div class="text-[10px] font-bold text-gray-400 uppercase">Judul Kursus</div>
-                  <div class="text-sm font-bold text-gray-900">{{ transaction.course }}</div>
+                  <div class="text-sm font-bold text-gray-900">{{ transaction.course?.title }}</div>
                 </div>
               </div>
               <div class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
-                  <UserCheck class="w-5 h-5" />
+                  <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                    <UserCheck class="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase">Instruktur</div>
+                    <div class="text-sm font-bold text-gray-900">NextSkill Mentor</div>
+                  </div>
                 </div>
-                <div>
-                  <div class="text-[10px] font-bold text-gray-400 uppercase">Instruktur</div>
-                  <div class="text-sm font-bold text-gray-900">{{ transaction.instructor }}</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -171,66 +190,63 @@ const sendReceipt = () => {
               <Calendar class="w-3.5 h-3.5" />
               Tanggal
             </div>
-            <div class="text-sm font-bold text-gray-900">{{ transaction.date }}</div>
+            <div class="text-sm font-bold text-gray-900">{{ transaction.created_at || '-' }}</div>
           </div>
           <div>
             <div class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase mb-2">
               <Clock class="w-3.5 h-3.5" />
-              Waktu
+              Waktu (Full)
             </div>
-            <div class="text-sm font-bold text-gray-900">{{ transaction.time }}</div>
+            <div class="text-sm font-bold text-gray-900 truncate max-w-[120px]" :title="transaction.updated_at">{{ transaction.updated_at || '-' }}</div>
           </div>
           <div>
             <div class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase mb-2">
               <CreditCard class="w-3.5 h-3.5" />
               Metode
             </div>
-            <div class="text-sm font-bold text-gray-900">{{ transaction.paymentMethod }}</div>
+            <div class="text-sm font-bold text-gray-900">Midtrans</div>
           </div>
         </div>
 
         <!-- Notes & Description -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div class="space-y-4">
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <FileText class="w-3.5 h-3.5 text-indigo-500" />
-              Keterangan
-            </h3>
-            <p class="text-sm text-gray-600 leading-relaxed">{{ transaction.description }}</p>
-          </div>
-          <div class="space-y-4">
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <AlertCircle class="w-3.5 h-3.5 text-indigo-500" />
-              Catatan Internal
-            </h3>
-            <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-sm text-indigo-700 font-medium">
-              {{ transaction.notes }}
+            <div class="space-y-4">
+              <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                <FileText class="w-3.5 h-3.5 text-indigo-500" />
+                Keterangan
+              </h3>
+              <p class="text-sm text-gray-600 leading-relaxed truncate max-w-full">Pembelian akses kursus: {{ transaction.course?.title }}</p>
             </div>
-          </div>
-        </div>
+            <div></div> <!-- Spacer for grid balance if needed, or just let it stay one column -->
 
         <!-- Total Summary -->
         <div class="pt-8 border-t-2 border-dashed border-gray-100 text-right">
           <div class="inline-block space-y-3 min-w-[280px]">
             <div class="flex justify-between items-center text-sm font-bold text-gray-400">
               <span>Subtotal</span>
-              <span class="text-gray-900">Rp {{ transaction.amount.toLocaleString('id-ID') }}</span>
+              <span class="text-gray-900">{{ transaction.gross_amount_formatted }}</span>
             </div>
             <div class="flex justify-between items-center text-sm font-bold text-gray-400">
-              <span>PPN (10%)</span>
-              <span class="text-gray-900">Rp {{ transaction.tax.toLocaleString('id-ID') }}</span>
+              <span>Biaya Layanan</span>
+              <span class="text-gray-900">Rp 0</span>
             </div>
             <div class="flex justify-between items-center pt-4 mt-2 border-t border-gray-100">
               <span class="text-lg font-black text-gray-900">Total Pembayaran</span>
-              <span class="text-3xl font-black text-indigo-600">Rp {{ transaction.total.toLocaleString('id-ID') }}</span>
+              <span class="text-3xl font-black text-indigo-600">{{ transaction.gross_amount_formatted }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Error State -->
+    <div v-else class="text-center py-24 bg-white rounded-[2rem] border border-gray-100 shadow-sm">
+        <AlertCircle class="w-12 h-12 text-gray-300 mx-auto mb-4" />
+        <p class="text-gray-500 font-bold">Gagal memuat detail transaksi.</p>
+        <button @click="fetchDetail" class="mt-4 text-indigo-600 font-bold hover:underline">Coba Lagi</button>
+    </div>
+
     <!-- Final Actions -->
-    <div class="flex flex-col sm:flex-row justify-end gap-4">
+    <div v-if="!loading && transaction" class="flex flex-col sm:flex-row justify-end gap-4">
       <button 
         @click="downloadInvoice" 
         class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-sm text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all shadow-sm active:scale-95"

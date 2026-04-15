@@ -1,20 +1,57 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Save } from 'lucide-vue-next'
 import BaseModal from '../../../components/shared/BaseModal.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { updateUser } from '@/api/user'
+import { useAlert } from '@/composables/useAlert'
 
+const authStore = useAuthStore()
+const { showAlert } = useAlert()
 const isModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
+const isSaving = ref(false)
+
+const form = ref({
+  name: '',
+  email: '',
+  expertise: '',
+  bio: ''
+})
+
+onMounted(() => {
+  if (authStore.user) {
+    form.value = {
+      name: authStore.user.name || '',
+      email: authStore.user.email || '',
+      expertise: authStore.user.expertise || '',
+      bio: authStore.user.bio || ''
+    }
+  }
+})
 
 const openSaveConfirm = () => {
   isModalOpen.value = true
 }
 
-const confirmSave = () => {
+const confirmSave = async () => {
   isModalOpen.value = false
-  setTimeout(() => {
-     isSuccessModalOpen.value = true
-  }, 200)
+  isSaving.value = true
+  try {
+    const payload = {
+      ...form.value,
+      role: authStore.user.role
+    }
+    const response = await updateUser(authStore.user.id, payload)
+    if (response) {
+      authStore.updateUser(form.value)
+      isSuccessModalOpen.value = true
+    }
+  } catch (err) {
+    showAlert('Gagal', err.message || 'Gagal memperbarui profil.', 'error')
+  } finally {
+    isSaving.value = false
+  }
 }
 </script>
 
@@ -33,19 +70,15 @@ const confirmSave = () => {
       <form @submit.prevent="openSaveConfirm" class="space-y-6">
         <div>
           <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
-          <input type="text" value="Danu Mentor" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none" />
+          <input v-model="form.name" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none" />
         </div>
         <div>
           <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
-          <input type="email" value="mentor@nextskill.com" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none" />
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Keahlian utama (Pisahkan dengan koma)</label>
-          <input type="text" value="Web Development, UI/UX" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none" />
+          <input v-model="form.email" type="email" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none" />
         </div>
         <div>
           <label class="block text-sm font-bold text-gray-700 mb-2">Biografi Singkat</label>
-          <textarea rows="4" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none">Saya adalah seorang instruktur Web Development berpengalaman lebih dari 5 tahun di bidang IT dan Software Engineering.</textarea>
+          <textarea v-model="form.bio" rows="4" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:bg-white transition-all outline-none"></textarea>
         </div>
         <div class="pt-4 border-t border-gray-100">
           <button
@@ -60,7 +93,7 @@ const confirmSave = () => {
     </div>
 
     <!-- Confirmation Modal -->
-    <BaseModal 
+    <BaseModal
       :is-open="isModalOpen"
       @close="isModalOpen = false"
       @confirm="confirmSave"
@@ -73,7 +106,7 @@ const confirmSave = () => {
     />
 
     <!-- Success Modal -->
-    <BaseModal 
+    <BaseModal
       :is-open="isSuccessModalOpen"
       @close="isSuccessModalOpen = false"
       @confirm="isSuccessModalOpen = false"

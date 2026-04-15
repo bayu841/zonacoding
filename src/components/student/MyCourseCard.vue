@@ -1,11 +1,13 @@
 <script setup>
 import { PlayCircle, Award, CheckCircle2 } from 'lucide-vue-next'
+import { useImage } from '@/composables/useImage'
 
 defineProps({
   course: { type: Object, required: true }
 })
 
 const emit = defineEmits(['click'])
+const { getProxyUrl, handleImageError, isEmoji } = useImage()
 </script>
 
 <template>
@@ -13,8 +15,11 @@ const emit = defineEmits(['click'])
   <div v-if="course.status === 'ongoing'" 
        @click="emit('click')"
        class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden cursor-pointer group hover:-translate-y-1 transition-all">
-    <div class="aspect-video relative overflow-hidden bg-gray-100">
-      <img :src="course.cover" alt="Cover" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+    <div class="aspect-video relative overflow-hidden bg-gray-100 flex items-center justify-center">
+      <template v-if="course.cover && isEmoji(course.cover)">
+        <span class="text-6xl">{{ course.cover.includes('/storage/') ? course.cover.split('/').pop() : course.cover }}</span>
+      </template>
+      <img v-else :src="getProxyUrl(course.cover)" alt="Cover" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" @error="handleImageError" />
       <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
         <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
           <PlayCircle class="w-8 h-8 text-indigo-600" />

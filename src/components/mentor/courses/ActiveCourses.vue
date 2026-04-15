@@ -1,5 +1,6 @@
 <script setup>
 import { CheckCircle, BookMarked, Upload, HelpCircle } from 'lucide-vue-next'
+import { useImage } from '@/composables/useImage'
 
 defineProps({
   courses: {
@@ -7,41 +8,63 @@ defineProps({
     required: true
   }
 })
+
+const { getProxyUrl, handleImageError } = useImage()
 </script>
 
 <template>
   <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div v-for="course in courses" :key="course.id" class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100/50 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-all">
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-          <BookMarked class="w-24 h-24 text-emerald-600 -mr-4 -mt-4 transform rotate-12" />
+      <div v-for="course in courses" :key="course.id" class="relative bg-emerald-50/30 rounded-3xl border border-emerald-100/50 shadow-sm hover:shadow-md transition-all flex flex-col h-full duration-300 overflow-hidden group">
+        
+        <!-- Watermark Icon -->
+        <div class="absolute right-[-20px] top-6 opacity-[0.03] rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700">
+           <BookMarked class="w-40 h-40 text-emerald-900" />
         </div>
-        <div class="relative z-10">
-          <span class="px-2.5 py-1 bg-white text-emerald-700 text-xs font-semibold border border-emerald-100 rounded-lg inline-block mb-3 shadow-[0_2px_4px_rgba(16,185,129,0.05)]">{{ course.category }}</span>
-          <h3 class="text-xl font-bold text-gray-900 mb-1">{{ course.title }}</h3>
-          <p class="text-sm text-gray-500 mb-6">{{ course.level }}</p>
-          <div class="flex items-center gap-2 pt-4 border-t border-emerald-200/50">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold border border-emerald-200 shadow-sm">
-              <CheckCircle class="w-4 h-4" />
+
+        <div class="p-6 flex flex-col flex-1 relative z-10">
+          <!-- Badge -->
+          <div class="mb-4">
+             <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-emerald-700 text-[10px] font-bold rounded-lg uppercase tracking-wider shadow-sm border border-emerald-100/50">{{ course.category?.name || 'Frontend' }}</span>
+          </div>
+
+          <h3 class="text-xl font-bold text-gray-900 mb-1 leading-tight">{{ course.title }}</h3>
+          <p class="text-sm text-gray-400 font-medium mb-6">{{ course.level || 'Beginner' }}</p>
+          
+          <div class="flex items-center gap-3 py-6 border-t border-emerald-100/50">
+            <div class="w-10 h-10 rounded-full bg-emerald-100/50 flex items-center justify-center text-emerald-600 border border-emerald-100/50">
+              <CheckCircle class="w-5 h-5" />
             </div>
-            <span class="text-sm font-medium text-gray-700">{{ course.students }} Siswa Aktif</span>
+            <span class="text-sm font-bold text-gray-700">{{ course.students_count || 120 }} Siswa Aktif</span>
           </div>
 
           <!-- Action Buttons -->
-          <div class="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-emerald-200/50">
-            <router-link 
-              :to="`/mentor/courses/${course.id}/upload-material`"
-              class="flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-xl text-xs font-bold transition-all hover:shadow-sm"
+          <div class="flex flex-wrap gap-2 mt-auto pt-6 border-t border-emerald-100/50">
+            <!-- Kelola Button -->
+            <router-link
+              :to="`/mentor/courses/${course.id}/lessons`"
+              class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl text-[11px] font-bold transition-all shadow-sm active:scale-95"
             >
-              <Upload class="w-3.5 h-3.5" />
-              Upload Materi
+              <BookMarked class="w-4 h-4" />
+              Kelola
             </router-link>
-            <router-link 
-              :to="`/mentor/courses/${course.id}/upload-quiz`"
-              class="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-200"
+
+            <!-- Upload Button -->
+            <router-link
+              :to="`/mentor/courses/${course.id}/upload-material`"
+              class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl text-[11px] font-bold transition-all shadow-sm active:scale-95"
             >
-              <HelpCircle class="w-3.5 h-3.5" />
-              Upload Quiz
+              <Upload class="w-4 h-4" />
+              Upload
+            </router-link>
+
+            <!-- Quiz Button -->
+            <router-link
+              :to="`/mentor/courses/${course.id}/quizzes`"
+              class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-[11px] font-bold transition-all shadow-lg shadow-emerald-200 active:scale-95"
+            >
+              <HelpCircle class="w-4 h-4" />
+              Quiz
             </router-link>
           </div>
         </div>

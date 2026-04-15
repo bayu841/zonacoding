@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 import Home from "../views/Home.vue";
 import ClasIndex from "../views/ClasIndex.vue";
 import Faq from "../views/Faq.vue";
@@ -108,6 +109,7 @@ const routes = [
   {
     path: "/admin",
     component: AdminLayout,
+    meta: { requiresAuth: true, role: "admin" },
     children: [
       // Dashboard
       { path: "", name: "admin.dashboard", component: AdminDashboard },
@@ -144,11 +146,20 @@ const routes = [
       // Students
       { path: "students", name: "admin.students.list", component: UserList },
 
-      // Transactions
       {
         path: "transactions",
         name: "admin.transactions.list",
         component: ManageTransaction,
+      },
+      {
+        path: "transactions/:transactionId",
+        name: "admin.transactions.detail",
+        component: TransactionDetail,
+      },
+      {
+        path: "withdrawals",
+        name: "admin.withdrawals.list",
+        component: () => import("../views/admin/transactions/WithdrawalList.vue"),
       },
 
       // System Settings
@@ -171,6 +182,7 @@ const routes = [
   {
     path: "/mentor",
     component: MentorLayout_M,
+    meta: { requiresAuth: true, role: "mentor" },
     children: [
       // Dashboard
       { path: "", name: "mentor.dashboard", component: MentorDashboard_M },
@@ -178,14 +190,29 @@ const routes = [
       // Courses Management
       { path: "courses", name: "mentor.courses.list", component: CourseList_M },
       {
+        path: "courses/:courseId/quizzes/edit/:quizId",
+        name: "mentor.quizzes.edit",
+        component: () => import("../views/mentor/courses/UploadQuiz.vue"),
+      },
+      {
         path: "courses/:courseId/upload-material",
         name: "mentor.courses.upload-material",
         component: UploadMaterial_M,
       },
       {
+        path: "courses/:courseId/quizzes",
+        name: "mentor.quizzes.list",
+        component: () => import("../views/mentor/courses/QuizList.vue"),
+      },
+      {
         path: "courses/:courseId/upload-quiz",
         name: "mentor.courses.upload-quiz",
         component: UploadQuiz_M,
+      },
+      {
+        path: "courses/:courseId/lessons",
+        name: "mentor.lessons.list",
+        component: () => import("../views/mentor/courses/LessonList.vue"),
       },
 
       // Assignments
@@ -223,6 +250,7 @@ const routes = [
   {
     path: "/student",
     component: StudentLayout,
+    meta: { requiresAuth: true, role: "student" },
     children: [
       { path: "", name: "student.dashboard", component: StudentDashboard },
       { path: "explore", name: "student.explore", component: ExploreCourses },
@@ -278,4 +306,37 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiredRole = to.matched.some(record => record.meta.role) 
+    ? to.matched.find(record => record.meta.role).meta.role 
+    : null;
+
+  // Prevent authenticated users from accessing login/register
+  const isAuthPage = to.name === "login" || to.name === "register";
+
+  if (isAuthPage && authStore.isAuthenticated) {
+    // Redirect based on role
+    if (authStore.user?.role === "admin") {
+      next({ name: "admin.dashboard" });
+    } else if (authStore.user?.role === "mentor") {
+      next({ name: "mentor.dashboard" });
+    } else {
+      next({ name: "student.dashboard" });
+    }
+    return;
+  }
+
+  if (requiresAuth && !authStore.isAuthenticated) {
+    next({ name: "login" });
+  } else if (requiredRole && authStore.user?.role !== requiredRole) {
+    next({ name: "Forbidden" });
+  } else {
+    next();
+  }
+});
+
 export default router;
+

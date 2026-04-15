@@ -1,22 +1,22 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import UserListHeader from '../../../components/admin/users/UserListHeader.vue'
 import UserListTable from '../../../components/admin/users/UserListTable.vue'
 import UserListGrid from '../../../components/admin/users/UserListGrid.vue'
 import UserFormModal from '../../../components/admin/users/UserFormModal.vue'
 import UserDetailModal from '../../../components/admin/users/UserDetailModal.vue'
 import UserDeleteModal from '../../../components/admin/users/UserDeleteModal.vue'
+import { getUsers, createUser, updateUser, deleteUser, getUser } from '@/api/user'
 
-// Data pengguna (ditambah beberapa data contoh untuk tampilan lebih kaya)
-const users = ref([
-  { id: 1, name: 'Budi Santoso', email: 'budi@example.com', role: 'student', status: 'Aktif', joined: '2026-03-12', avatar: null },
-  { id: 2, name: 'Siti Aminah', email: 'siti@example.com', role: 'mentor', status: 'Verifikasi', joined: '2026-02-05', avatar: null },
-  { id: 3, name: 'Andi Setiawan', email: 'andi@example.com', role: 'admin', status: 'Aktif', joined: '2025-12-01', avatar: null },
-  { id: 4, name: 'Dewi Lestari', email: 'dewi@example.com', role: 'student', status: 'Aktif', joined: '2026-01-20', avatar: null },
-  { id: 5, name: 'Rudi Hartono', email: 'rudi@example.com', role: 'mentor', status: 'Tidak Aktif', joined: '2025-10-15', avatar: null },
-  { id: 6, name: 'Maya Sari', email: 'maya@example.com', role: 'student', status: 'Aktif', joined: '2026-04-01', avatar: null },
-])
-
+// State
+const users = ref([])
+const pagination = ref({
+  total: 0,
+  per_page: 6,
+  current_page: 1,
+  last_page: 1
+})
+const loading = ref(false)
 const filterRole = ref('all')
 const searchQuery = ref('')
 const viewMode = ref('table') // 'table' atau 'grid'
@@ -38,15 +38,38 @@ const selectedUser = ref(null)
 const showDeleteModal = ref(false)
 const userToDelete = ref(null)
 
-// Filtered users
-const filteredUsers = computed(() => {
-  return users.value.filter(user => {
-    const matchesRole = filterRole.value === 'all' || user.role === filterRole.value
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchQuery.value.toLowerCase())
-    return matchesRole && matchesSearch
-  })
+const fetchUsers = async (page = 1) => {
+  loading.value = true
+  try {
+    const params = {
+      page,
+      role: filterRole.value !== 'all' ? filterRole.value : undefined,
+      search: searchQuery.value || undefined
+    }
+    const response = await getUsers(params)
+    users.value = response.data.data
+    pagination.value = response.data.pagination
+  } catch (err) {
+    console.error('Fetch error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchUsers()
 })
+
+// Watchers (manual via events from header)
+const handleFilterChange = (role) => {
+  filterRole.value = role
+  fetchUsers(1)
+}
+
+const handleSearchChange = (query) => {
+  searchQuery.value = query
+  fetchUsers(1)
+}
 
 // Modal functions
 const openCreateModal = () => {
@@ -73,28 +96,23 @@ const closeFormModal = () => {
   editingUserId.value = null
 }
 
-const handleFormSubmit = (formData) => {
-  if (modalMode.value === 'create') {
-    const newUser = {
-      id: Math.max(...users.value.map(u => u.id), 0) + 1,
-      ...formData,
-      status: 'Aktif',
-      joined: new Date().toISOString().split('T')[0]
-    }
-    users.value.push(newUser)
-    console.log('Menambah pengguna:', newUser)
-  } else {
-    const userIndex = users.value.findIndex(u => u.id === editingUserId.value)
-    if (userIndex !== -1) {
-      users.value[userIndex] = {
-        ...users.value[userIndex],
-        ...formData
+const handleFormSubmit = async (formData) => {
+  try {
+    if (modalMode.value === 'create') {
+      await createUser(formData)
+    } else {
+      // Don't send password if empty on edit
+      const updateData = { ...formData }
+      if (!updateData.password) {
+        delete updateData.password
       }
-      console.log('Mengupdate pengguna:', users.value[userIndex])
+      await updateUser(editingUserId.value, updateData)
     }
+    fetchUsers(pagination.value.current_page)
+    closeFormModal()
+  } catch (err) {
+    console.error('Save error:', err)
   }
-  alert(modalMode.value === 'create' ? 'Pengguna berhasil ditambahkan!' : 'Pengguna berhasil diperbarui!')
-  closeFormModal()
 }
 
 const openDeleteModal = (user) => {
@@ -107,20 +125,29 @@ const closeDeleteModal = () => {
   userToDelete.value = null
 }
 
-const confirmDelete = () => {
+const confirmDelete = async () => {
   if (userToDelete.value) {
-    users.value = users.value.filter(u => u.id !== userToDelete.value.id)
-    console.log('Pengguna berhasil dihapus')
-    closeDeleteModal()
-    if (showDetailModal.value) {
-      closeDetailModal()
+    try {
+      await deleteUser(userToDelete.value.id)
+      fetchUsers(pagination.value.current_page)
+      closeDeleteModal()
+      if (showDetailModal.value) {
+        closeDetailModal()
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
     }
   }
 }
 
-const openDetailModal = (user) => {
-  selectedUser.value = user
-  showDetailModal.value = true
+const openDetailModal = async (user) => {
+  try {
+    const response = await getUser(user.id)
+    selectedUser.value = response.data
+    showDetailModal.value = true
+  } catch (err) {
+    console.error('Detail error:', err)
+  }
 }
 
 const closeDetailModal = () => {
@@ -129,6 +156,7 @@ const closeDetailModal = () => {
 }
 </script>
 
+
 <template>
   <div class="space-y-6">
     <!-- Header with UserListHeader Component -->
@@ -136,29 +164,39 @@ const closeDetailModal = () => {
       :filterRole="filterRole"
       :searchQuery="searchQuery"
       :viewMode="viewMode"
-      @update:filterRole="filterRole = $event"
-      @update:searchQuery="searchQuery = $event"
+      @update:filterRole="handleFilterChange"
+      @update:searchQuery="handleSearchChange"
       @update:viewMode="viewMode = $event"
       @open-create="openCreateModal"
     />
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+
     <!-- Table View Component -->
     <UserListTable
-      v-if="viewMode === 'table'"
-      :users="filteredUsers"
+      v-else-if="viewMode === 'table'"
+      :users="users"
+      :pagination="pagination"
       @view-detail="openDetailModal"
       @view-edit="openEditModal"
       @delete-user="openDeleteModal"
+      @change-page="fetchUsers"
     />
 
     <!-- Grid View Component -->
     <UserListGrid
       v-else
-      :users="filteredUsers"
+      :users="users"
+      :pagination="pagination"
       @view-detail="openDetailModal"
       @view-edit="openEditModal"
       @delete-user="openDeleteModal"
+      @change-page="fetchUsers"
     />
+
 
     <!-- Modals -->
     <UserFormModal

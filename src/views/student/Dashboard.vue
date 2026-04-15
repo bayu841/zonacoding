@@ -3,10 +3,16 @@ import { ref } from 'vue'
 import {
   BookOpen,
   ArrowRight,
-  HelpCircle
+  HelpCircle,
+  Trophy,
+  Flame,
+  Clock
 } from 'lucide-vue-next'
 import StatCard from '../../components/student/StatCard.vue'
 import RecentCourseCard from '../../components/student/RecentCourseCard.vue'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
 
 // Dummy State
 const progress = ref(65) // 65% for current dominant course
@@ -32,7 +38,7 @@ const recentCourses = ref([
       
       <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="text-white">
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">Halo, Student! 👋</h1>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">Halo, {{ authStore.user?.name || 'Student' }}! 👋</h1>
           <p class="text-indigo-200 text-lg max-w-xl">Ayo lanjutkan belajarmu. Rata-rata siswa menghabiskan 4 jam sehari. Bisakah kamu melampauinya?</p>
         </div>
         <!-- Total XP Badge -->

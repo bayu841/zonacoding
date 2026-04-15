@@ -65,27 +65,11 @@ const openEditModal = () => {
           </p>
         </div>
 
-        <!-- Status -->
-        <div>
-          <label class="block text-sm font-medium text-gray-500">Status</label>
-          <p class="mt-1">
-            <span :class="[
-              'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border',
-              {
-                'bg-emerald-50 text-emerald-700 border-emerald-200': user.status === 'Aktif',
-                'bg-amber-50 text-amber-700 border-amber-200': user.status === 'Verifikasi',
-                'bg-red-50 text-red-700 border-red-200': user.status === 'Tidak Aktif'
-              }
-            ]">
-              {{ user.status }}
-            </span>
-          </p>
-        </div>
 
         <!-- Joined Date -->
         <div>
           <label class="block text-sm font-medium text-gray-500">Tanggal Bergabung</label>
-          <p class="mt-1 text-base text-gray-900">{{ user.joined }}</p>
+          <p class="mt-1 text-base text-gray-900">{{ new Date(user.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
         </div>
       </div>
 
@@ -93,16 +77,17 @@ const openEditModal = () => {
       <div class="pt-5 border-t border-gray-200 flex justify-between gap-3 mt-8">
         <button
           @click="closeModal"
-          class="flex-1 bg-white py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+          class="flex-1 bg-white py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           Tutup
         </button>
         <button
           @click="openEditModal"
-          class="flex-1 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          class="flex-1 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
           Edit Pengguna
         </button>
+
       </div>
     </div>
   </div>

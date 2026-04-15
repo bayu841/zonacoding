@@ -24,11 +24,11 @@ const getRankIcon = (rank) => {
           <th scope="col" class="px-6 py-4 rounded-tl-xl text-center w-16">Peringkat</th>
           <th scope="col" class="px-6 py-4">Nama Siswa</th>
           <th scope="col" class="px-6 py-4">Kursus Aktif</th>
-          <th scope="col" class="px-6 py-4 text-right rounded-tr-xl">Total Poin (XP)</th>
+          <th scope="col" class="px-6 py-4 text-right rounded-tr-xl">Total Poin</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100/80">
-        <tr v-for="student in students" :key="student.id" class="hover:bg-gray-50/30 transition-colors group">
+        <tr v-for="student in students" :key="student.rank" class="hover:bg-gray-50/30 transition-colors group">
           
           <!-- Rank Column -->
           <td class="px-6 py-4 font-bold text-center">
@@ -49,12 +49,12 @@ const getRankIcon = (rank) => {
           <td class="px-6 py-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-sm">
-                {{ student.name.charAt(0) }}
+                {{ student.student_name.charAt(0) }}
               </div>
               <div>
-                <p class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors text-base">{{ student.name }}</p>
+                <p class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors text-base">{{ student.student_name }}</p>
                 <div class="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
-                  <span class="bg-gray-100 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider">Level {{ Math.floor(student.points / 1000) + 1 }}</span>
+                  <span class="bg-gray-100 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider">Level {{ student.level }}</span>
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@ const getRankIcon = (rank) => {
           <!-- Active Courses Column -->
           <td class="px-6 py-4 font-medium text-gray-700">
             <div class="flex flex-wrap gap-1">
-              <span v-for="(course, idx) in student.courses" :key="idx" class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-xs border border-blue-100">
+              <span v-for="(course, idx) in student.active_courses" :key="idx" class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-xs border border-blue-100">
                 {{ course }}
               </span>
             </div>
@@ -72,8 +72,8 @@ const getRankIcon = (rank) => {
           <!-- Points Column -->
           <td class="px-6 py-4 text-right">
             <div class="inline-flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
-              <span class="font-black text-amber-600 text-lg tracking-tight">{{ student.points.toLocaleString('id-ID') }}</span>
-              <span class="text-amber-500 text-xs font-bold">XP</span>
+              <span class="font-black text-amber-600 text-lg tracking-tight">{{ student.total_points.toLocaleString('id-ID') }}</span>
+              <span class="text-amber-500 text-xs font-bold">Poin</span>
             </div>
           </td>
           

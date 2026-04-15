@@ -39,7 +39,7 @@ ChartJS.register(
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
       <!-- Main Chart + Drop-off Analytics -->
       <div class="lg:col-span-2 space-y-6">
-        <LineChartCard title="Grafik Pendapatan" />
+        <LineChartCard title="Pendaftaran Siswa Bulanan" />
         <DropOffChart />
       </div>
 

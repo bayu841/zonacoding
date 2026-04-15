@@ -193,11 +193,11 @@ const postComment = () => {
   if (!newComment.value.trim()) return
   discussions.value.push({
     id: Date.now(),
-    author: 'Student User',
+    author: authStore.user?.name || 'Student User',
     isMentor: false,
     text: newComment.value,
     time: 'Baru saja',
-    avatar: 'S'
+    avatar: authStore.user?.name?.charAt(0).toUpperCase() || 'S'
   })
   newComment.value = ''
 }

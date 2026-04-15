@@ -1,39 +1,62 @@
 <script setup>
-import { ref } from 'vue'
-import { BookOpen, CheckCircle, Clock, Plus } from 'lucide-vue-next'
+import { computed, onMounted, ref } from 'vue'
+import { BookOpen, CheckCircle, Clock } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import { getCoursesNoMentor, getActiveCoursesByMentor } from '@/api/course'
+import { getPendingMentorApplications } from '@/api/courseMentorApplication'
 
 import AvailableCourses from '../../../components/mentor/courses/AvailableCourses.vue'
 import ActiveCourses from '../../../components/mentor/courses/ActiveCourses.vue'
 import PendingCourses from '../../../components/mentor/courses/PendingCourses.vue'
 
 const router = useRouter()
-const activeTab = ref('tersedia') // 'tersedia' | 'aktif' | 'menunggu'
+const activeTab = ref('tersedia')
 
-// DUMMY DATA
-const availableCourses = ref([
-  { id: 101, title: 'Dasar Pemrograman Python', category: 'Backend', level: 'Beginner', quota: 50, status: 'Open' },
-  { id: 102, title: 'Mastering React 18', category: 'Frontend', level: 'Advanced', quota: 30, status: 'Open' },
-  { id: 103, title: 'UI/UX untuk Aplikasi Mobile', category: 'Design', level: 'Intermediate', quota: 40, status: 'Open' },
-  { id: 104, title: 'Node.js & Express API', category: 'Backend', level: 'Intermediate', quota: 35, status: 'Open' }
-])
+const availableCourses = ref([])
+const activeCourses = ref([])
+const pendingCourses = ref([])
+const loading = ref(false)
 
-const activeCourses = ref([
-  { id: 201, title: 'Membuat Website dengan HTML & CSS', category: 'Frontend', level: 'Beginner', students: 120 },
-  { id: 202, title: 'Tailwind CSS dari Nol', category: 'Frontend', level: 'Beginner', students: 85 }
-])
+const filteredAvailableCourses = computed(() => {
+  const pendingCourseIds = new Set(pendingCourses.value.map(app => app.course_id))
+  return availableCourses.value.filter(course => !pendingCourseIds.has(course.id))
+})
 
-const pendingCourses = ref([
-  { id: 301, title: 'Figma to Code', category: 'Design', level: 'Intermediate', appliedDate: 'Kemarin' }
-])
+const fetchAllData = async () => {
+  loading.value = true
+  try {
+    const [avail, active, pending] = await Promise.all([
+      getCoursesNoMentor(),
+      getActiveCoursesByMentor(),
+      getPendingMentorApplications()
+    ])
+    
+    if (avail.status) availableCourses.value = avail.data
+    if (active.status) activeCourses.value = active.data
+    
+    if (pending.status) {
+      // Perkaya data pending dengan detail kursus jika tersedia di list available
+      pendingCourses.value = pending.data.data.map(app => {
+        const courseDetail = availableCourses.value.find(c => c.id === app.course_id)
+        return {
+          ...app,
+          course: app.course || courseDetail
+        }
+      })
+    }
+  } catch (err) {
+    console.error('Fetch dashboard data error:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
-const handleApply = (course) => {
-  // Pindahkan dari kursus tersedia ke menunggu persetujuan
-  availableCourses.value = availableCourses.value.filter(c => c.id !== course.id)
-  pendingCourses.value.push({
-    ...course,
-    appliedDate: 'Baru Saja'
-  })
+onMounted(() => {
+  fetchAllData()
+})
+
+const handleRefresh = () => {
+  fetchAllData()
 }
 </script>
 
@@ -48,8 +71,8 @@ const handleApply = (course) => {
       </div>
 
     <!-- Tabs Navigation -->
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8">
+    <div class="border-b border-gray-100 mb-8 bg-white/50 backdrop-blur-sm -mx-6 px-6 sticky top-0 z-20">
+      <nav class="flex space-x-8" aria-label="Tabs">
         <button
           @click="activeTab = 'tersedia'"
           :class="[
@@ -59,7 +82,9 @@ const handleApply = (course) => {
         >
           <BookOpen class="w-4 h-4" />
           Kursus Tersedia
+          <span class="ml-1 bg-emerald-100 text-emerald-600 py-0.5 px-2 rounded-full text-xs font-bold">{{ filteredAvailableCourses.length }}</span>
         </button>
+
         <button
           @click="activeTab = 'aktif'"
           :class="[
@@ -69,12 +94,13 @@ const handleApply = (course) => {
         >
           <CheckCircle class="w-4 h-4" />
           Kursus Aktif Anda
-          <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">{{ activeCourses.length }}</span>
+          <span class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs font-bold">{{ activeCourses.length }}</span>
         </button>
+
         <button
           @click="activeTab = 'menunggu'"
           :class="[
-            activeTab === 'menunggu' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            activeTab === 'menunggu' ? 'border-amber-500 text-amber-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
             'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-all'
           ]"
         >
@@ -87,20 +113,20 @@ const handleApply = (course) => {
 
     <!-- Tab Contents -->
     <div class="mt-6">
-      <AvailableCourses 
-        v-if="activeTab === 'tersedia'" 
-        :courses="availableCourses" 
-        @apply="handleApply"
+      <AvailableCourses
+        v-if="activeTab === 'tersedia'"
+        :courses="filteredAvailableCourses"
+        @refresh="handleRefresh"
       />
-      
-      <ActiveCourses 
-        v-if="activeTab === 'aktif'" 
-        :courses="activeCourses" 
+
+      <ActiveCourses
+        v-if="activeTab === 'aktif'"
+        :courses="activeCourses"
       />
-      
-      <PendingCourses 
-        v-if="activeTab === 'menunggu'" 
-        :courses="pendingCourses" 
+
+      <PendingCourses
+        v-if="activeTab === 'menunggu'"
+        :courses="pendingCourses"
       />
     </div>
   </div>

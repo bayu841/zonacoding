@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useImage } from "@/composables/useImage";
+
+const { getProxyUrl, handleImageError } = useImage();
 
 // FULL TEXT (gabung semua)
 const fullText = "Belajar  Lebih Mudah di NextSkill";
@@ -77,6 +80,7 @@ const highlightText = computed(() => {
           src="/src/assets/images/hero.webp" 
           alt="Hero Image"
           class="w-60 sm:w-80 md:w-full max-w-md mx-auto transition-all duration-700 ease-out"
+          @error="handleImageError"
           :class="showImage 
             ? 'opacity-100 translate-y-0' 
             : 'opacity-0 translate-y-10'"
@@ -84,5 +88,5 @@ const highlightText = computed(() => {
       </div>
     </div>
   </section>
-  <img src="../assets/images/pattern2.webp" alt="" class="w-[200px] rotate-12">
+  <img src="../assets/images/pattern2.webp" alt="" class="w-[200px] rotate-12" @error="handleImageError">
 </template>

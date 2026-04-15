@@ -1,6 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { Check, ChevronRight, ChevronLeft, Save, Layout, BookOpen, Settings, Plus } from 'lucide-vue-next'
+import { ref, watch, onMounted } from 'vue'
+import { Check, ChevronRight, ChevronLeft, Save, Layout, BookOpen, Settings, Plus, Upload, X } from 'lucide-vue-next'
+import { useImage } from '@/composables/useImage'
+import { getCategories } from '@/api/category'
+import { getUsers } from '@/api/user'
 
 const props = defineProps({
   initialData: {
@@ -8,14 +11,13 @@ const props = defineProps({
     default: () => ({
       title: '',
       description: '',
-      category: 'Frontend',
+      category_id: '',
+      user_id: '',
       thumbnail: null,
-      modules: [
-        { title: '', lessons: [''] }
-      ],
       price: 0,
-      level: 'Beginner',
-      status: 'Draft'
+      level: 'beginner',
+      status: 'draft',
+      is_certificate: 0
     })
   },
   isEdit: {
@@ -28,10 +30,55 @@ const emit = defineEmits(['submit', 'cancel'])
 
 const currentStep = ref(1)
 const form = ref({ ...props.initialData })
+const categories = ref([])
+const mentors = ref([])
+const thumbnailPreview = ref(null)
+const thumbnailFile = ref(null)
+const { getProxyUrl, handleImageError } = useImage()
+
+const fetchInitialData = async () => {
+  try {
+    const [catRes, userRes] = await Promise.all([
+      getCategories(),
+      getUsers({ role: 'mentor' })
+    ])
+    categories.value = catRes.data.data
+    mentors.value = userRes.data.data
+  } catch (err) {
+    console.error('Error fetching data for form:', err)
+  }
+}
+
+onMounted(() => {
+  fetchInitialData()
+  if (props.initialData.thumbnail && typeof props.initialData.thumbnail === 'string') {
+    thumbnailPreview.value = props.initialData.thumbnail
+  }
+})
 
 watch(() => props.initialData, (newVal) => {
   form.value = { ...newVal }
+  if (newVal.thumbnail && typeof newVal.thumbnail === 'string') {
+    thumbnailPreview.value = newVal.thumbnail
+  }
 }, { deep: true })
+
+const handleThumbnailUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    thumbnailFile.value = file
+    thumbnailPreview.value = URL.createObjectURL(file)
+  }
+}
+
+const clearThumbnail = () => {
+  thumbnailFile.value = null
+  thumbnailPreview.value = null
+  if (props.isEdit) {
+    // Keep the old one if not replaced? Or mark it for deletion?
+    // Usually if we clear it we might want to keep it null.
+  }
+}
 
 const nextStep = () => {
     if (currentStep.value < 3) currentStep.value++
@@ -42,9 +89,24 @@ const prevStep = () => {
 }
 
 const submitForm = () => {
-    emit('submit', { ...form.value })
+    const formData = new FormData()
+    formData.append('title', form.value.title)
+    formData.append('description', form.value.description || '')
+    formData.append('category_id', form.value.category_id)
+    formData.append('user_id', form.value.user_id)
+    formData.append('level', form.value.level)
+    formData.append('price', form.value.price)
+    formData.append('status', form.value.status)
+    formData.append('is_certificate', form.value.is_certificate ? '1' : '0')
+    
+    if (thumbnailFile.value) {
+      formData.append('thumbnail', thumbnailFile.value)
+    }
+
+    emit('submit', formData)
 }
 </script>
+
 
 <template>
   <div class="max-w-4xl mx-auto">
@@ -101,13 +163,13 @@ const submitForm = () => {
             <p class="text-sm text-gray-500">Isi detail dasar untuk kursus Anda.</p>
           </div>
           
-          <div class="space-y-4">
-            <div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
               <label class="block text-sm font-bold text-gray-700 mb-1">Judul Kursus</label>
               <input 
                 v-model="form.title" 
                 type="text" 
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400" 
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 font-medium" 
                 placeholder="Contoh: Mastering Vue 3 with Advanced Patterns" 
               />
             </div>
@@ -115,27 +177,74 @@ const submitForm = () => {
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-1">Kategori</label>
               <select 
-                v-model="form.category" 
+                v-model="form.category_id" 
                 class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all"
               >
-                <option value="Frontend">Frontend Development</option>
-                <option value="Backend">Backend Development</option>
-                <option value="Design">UI/UX Design</option>
-                <option value="Mobile">Mobile Development</option>
+                <option value="" disabled>Pilih Kategori</option>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
               </select>
             </div>
 
             <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Mentor</label>
+              <select 
+                v-model="form.user_id" 
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all"
+              >
+                <option value="" disabled>Pilih Mentor</option>
+                <option v-for="mentor in mentors" :key="mentor.id" :value="mentor.id">{{ mentor.name }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Level Kursus</label>
+              <select 
+                v-model="form.level" 
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all"
+              >
+                <option value="beginner">Beginner (Pemula)</option>
+                <option value="intermediate">Intermediate (Menengah)</option>
+                <option value="advanced">Advanced (Lanjutan)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Thumbnail</label>
+              <div class="flex items-center gap-4">
+                <div 
+                  v-if="thumbnailPreview" 
+                  class="relative w-24 h-14 rounded-lg overflow-hidden border border-gray-200 shadow-sm"
+                >
+                  <img :src="getProxyUrl(thumbnailPreview)" class="w-full h-full object-cover" @error="handleImageError" />
+                  <button 
+                    @click="clearThumbnail" 
+                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 shadow-sm"
+                  >
+                    <X class="w-3 h-3" />
+                  </button>
+                </div>
+                <label class="flex-1 cursor-pointer">
+                  <div class="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-50/50 border-2 border-dashed border-indigo-200 rounded-xl text-indigo-600 hover:bg-indigo-50 transition-all font-bold text-sm">
+                    <Upload class="w-4 h-4" />
+                    {{ thumbnailPreview ? 'Ganti Foto' : 'Unggah Foto' }}
+                  </div>
+                  <input type="file" @change="handleThumbnailUpload" class="hidden" accept="image/*" />
+                </label>
+              </div>
+            </div>
+
+            <div class="md:col-span-2">
               <label class="block text-sm font-bold text-gray-700 mb-1">Deskripsi Lengkap</label>
               <textarea 
                 v-model="form.description" 
-                rows="5" 
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all"
+                rows="4" 
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400"
                 placeholder="Jelaskan detail apa yang akan dipelajari di kursus ini..."
               ></textarea>
             </div>
           </div>
         </div>
+
 
         <!-- Step 2: Kurikulum -->
         <div v-show="currentStep === 2" class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -209,7 +318,7 @@ const submitForm = () => {
         <div v-show="currentStep === 3" class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <div class="border-b border-gray-100 pb-5 mb-5">
             <h3 class="text-xl font-bold text-gray-900">Harga & Pengaturan</h3>
-            <p class="text-sm text-gray-500">Tentukan harga kursus dan tingkat kesulitan.</p>
+            <p class="text-sm text-gray-500">Tentukan harga kursus dan status sertifikat.</p>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,26 +337,42 @@ const submitForm = () => {
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Level Kursus</label>
-              <select 
-                v-model="form.level" 
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 outline-none transition-all"
-              >
-                <option value="Beginner">Beginner (Pemula)</option>
-                <option value="Intermediate">Intermediate (Menengah)</option>
-                <option value="Advanced">Advanced (Lanjutan)</option>
-              </select>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Sertifikat</label>
+              <div class="flex gap-4">
+                <button 
+                  type="button"
+                  @click="form.is_certificate = 1"
+                  :class="[
+                    'flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all flex items-center justify-center gap-2',
+                    form.is_certificate == 1 ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                  ]"
+                >
+                  <Check v-if="form.is_certificate == 1" class="w-4 h-4" />
+                  Ada Sertifikat
+                </button>
+                <button 
+                  type="button"
+                  @click="form.is_certificate = 0"
+                  :class="[
+                    'flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all flex items-center justify-center gap-2',
+                    form.is_certificate == 0 ? 'bg-gray-50 border-gray-400 text-gray-600 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                  ]"
+                >
+                  <X v-if="form.is_certificate == 0" class="w-4 h-4" />
+                  Tidak Ada
+                </button>
+              </div>
             </div>
             
-            <div>
+            <div class="md:col-span-2">
               <label class="block text-sm font-bold text-gray-700 mb-1">Status Publikasi</label>
               <div class="flex gap-4">
                 <button 
                   type="button"
-                  @click="form.status = 'Draft'"
+                  @click="form.status = 'draft'"
                   :class="[
                     'flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all flex items-center justify-center gap-2',
-                    form.status === 'Draft' ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                    form.status === 'draft' ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
                   ]"
                 >
                   <div class="w-2 h-2 rounded-full bg-amber-400"></div>
@@ -255,10 +380,10 @@ const submitForm = () => {
                 </button>
                 <button 
                   type="button"
-                  @click="form.status = 'Published'"
+                  @click="form.status = 'published'"
                   :class="[
                     'flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all flex items-center justify-center gap-2',
-                    form.status === 'Published' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                    form.status === 'published' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
                   ]"
                 >
                   <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
@@ -268,6 +393,7 @@ const submitForm = () => {
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- Action Buttons -->

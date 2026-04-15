@@ -1,14 +1,18 @@
 <script setup>
-import { Edit, Trash2, Eye, Mail, Calendar, Search } from 'lucide-vue-next'
+import { Edit, Trash2, Eye, Mail, Calendar, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { useImage } from '@/composables/useImage'
 
 defineProps({
-  users: Array
+  users: Array,
+  pagination: Object
 })
 
-defineEmits(['view-detail', 'view-edit', 'delete-user'])
+defineEmits(['view-detail', 'view-edit', 'delete-user', 'change-page'])
+
+const { getProxyUrl, handleImageError, isEmoji } = useImage()
 
 const getInitials = (name) => {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '??'
 }
 
 const getRoleBadgeClass = (role) => {
@@ -20,12 +24,16 @@ const getRoleBadgeClass = (role) => {
   return classes[role] || 'bg-gray-100 text-gray-800'
 }
 
-const getStatusClass = (status) => {
-  return status === 'Aktif'
+const getStatusClass = (user) => {
+  return user.email_verified_at
     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-    : status === 'Verifikasi'
-    ? 'bg-amber-50 text-amber-700 border-amber-200'
-    : 'bg-red-50 text-red-700 border-red-200'
+    : 'bg-gray-50 text-gray-600 border-gray-200'
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 </script>
 
@@ -37,7 +45,6 @@ const getStatusClass = (status) => {
           <tr class="bg-gray-50/80">
             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pengguna</th>
             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Peran</th>
-            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Bergabung</th>
             <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
           </tr>
@@ -46,8 +53,12 @@ const getStatusClass = (status) => {
           <tr v-for="user in users" :key="user.id" class="hover:bg-blue-50/30 transition-colors duration-200">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-semibold shadow-sm">
-                  {{ getInitials(user.name) }}
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-semibold shadow-sm overflow-hidden">
+                  <template v-if="user.avatar && isEmoji(user.avatar)">
+                    <span class="text-xl">{{ user.avatar.includes('/storage/') ? user.avatar.split('/').pop() : user.avatar }}</span>
+                  </template>
+                  <img v-else-if="user.avatar" :src="getProxyUrl(user.avatar)" :alt="user.name" class="w-full h-full object-cover" @error="handleImageError" />
+                  <span v-else>{{ getInitials(user.name) }}</span>
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
@@ -64,14 +75,9 @@ const getStatusClass = (status) => {
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span :class="['inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border', getStatusClass(user.status)]">
-                {{ user.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-600 flex items-center gap-1">
                 <Calendar class="w-3.5 h-3.5 text-gray-400" />
-                {{ user.joined }}
+                {{ formatDate(user.created_at) }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right">
@@ -103,15 +109,36 @@ const getStatusClass = (status) => {
         </tbody>
       </table>
     </div>
-    <!-- Pagination Sederhana -->
-    <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-      <p class="text-sm text-gray-500">Menampilkan {{ users.length }} pengguna</p>
+
+    <!-- Pagination -->
+    <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
+      <p class="text-sm text-gray-500">
+        Menampilkan <span class="font-medium text-gray-700">{{ users.length }}</span> dari <span class="font-medium text-gray-700">{{ pagination.total }}</span> pengguna
+      </p>
       <div class="flex items-center gap-2">
-        <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50" disabled>Sebelumnya</button>
-        <button class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg shadow-sm">1</button>
-        <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">2</button>
-        <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Selanjutnya</button>
+        <button 
+          @click="$emit('change-page', pagination.current_page - 1)"
+          :disabled="pagination.current_page === 1"
+          class="p-2 text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 rounded-lg transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none"
+        >
+          <ChevronLeft class="w-4 h-4" />
+        </button>
+        
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-gray-400 px-2">Halaman</span>
+          <span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md">{{ pagination.current_page }}</span>
+          <span class="text-xs text-gray-400 px-2">dari {{ pagination.last_page }}</span>
+        </div>
+
+        <button 
+          @click="$emit('change-page', pagination.current_page + 1)"
+          :disabled="pagination.current_page === pagination.last_page"
+          class="p-2 text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 rounded-lg transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none"
+        >
+          <ChevronRight class="w-4 h-4" />
+        </button>
       </div>
     </div>
   </div>
 </template>
+

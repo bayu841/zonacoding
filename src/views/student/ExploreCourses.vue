@@ -1,41 +1,78 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { Search } from 'lucide-vue-next'
+import { ref, onMounted, watch } from 'vue'
+import { Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import BaseModal from '../../components/shared/BaseModal.vue'
-import MidtransSnapMock from '../../components/shared/MidtransSnapMock.vue'
 import ExploreCourseCard from '../../components/student/ExploreCourseCard.vue'
+import { getMentorActiveCourses } from '@/api/course'
+import { getCategories } from '@/api/category'
+import { checkout, handleCallback } from '@/api/transaction'
 
 const searchQuery = ref('')
 const selectedCategory = ref('Semua')
-
-// Dummy Categories
-const categories = ['Semua', 'Frontend', 'Backend', 'UI/UX Design', 'Digital Marketing']
-
-// Dummy Available Courses
-const availableCourses = ref([
-  { id: 101, title: 'Mastering React & Next.js', category: 'Frontend', mentor: 'Budi Santoso', rating: 4.8, students: 1250, hours: '12j 30m', lessons: 45, price: 'Rp 250.000', color: 'indigo', image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=600&h=400' },
-  { id: 102, title: 'Backend Node.js Advanced', category: 'Backend', mentor: 'Siti Rahma', rating: 4.9, students: 890, hours: '15j 45m', lessons: 60, price: 'Rp 300.000', color: 'green', image: 'https://images.unsplash.com/photo-1627398225058-f4f408731c5f?auto=format&fit=crop&q=80&w=600&h=400' },
-  { id: 103, title: 'UI/UX untuk Pemula', category: 'UI/UX Design', mentor: 'Arief Muhammad', rating: 4.7, students: 2100, hours: '8j 15m', lessons: 32, price: 'Gratis', color: 'pink', image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=600&h=400' },
-  { id: 104, title: 'Vue 3 Composition API', category: 'Frontend', mentor: 'Budi Santoso', rating: 4.6, students: 540, hours: '10j 0m', lessons: 38, price: 'Rp 150.000', color: 'emerald', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600&h=400' }
-])
+const categories = ref(['Semua'])
+const availableCourses = ref([])
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  total: 0
+})
+const loading = ref(false)
 
 const isEnrollModalOpen = ref(false)
 const isSuccessModalOpen = ref(false)
-const isMidtransOpen = ref(false)
 const selectedCourse = ref(null)
 
-const filteredCourses = computed(() => {
-  let result = availableCourses.value
-  
-  if (selectedCategory.value !== 'Semua') {
-    result = result.filter(c => c.category === selectedCategory.value)
+const fetchCategories = async () => {
+  try {
+    const response = await getCategories()
+    const rawData = response.data?.data || response.data || []
+    if (Array.isArray(rawData)) {
+      categories.value = ['Semua', ...rawData.map(c => c.name)]
+    }
+  } catch (err) {
+    console.error('Failed to fetch categories:', err)
   }
-  
-  if (searchQuery.value) {
-    result = result.filter(c => c.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+}
+
+const fetchCourses = async (page = 1) => {
+  loading.value = true
+  try {
+    const params = {
+      page,
+      search: searchQuery.value
+    }
+    
+    if (selectedCategory.value !== 'Semua') {
+      params.category = selectedCategory.value
+    }
+
+    const response = await getMentorActiveCourses(params)
+    const resultData = response.data || {}
+    availableCourses.value = resultData.data || []
+    pagination.value = resultData.pagination || { current_page: 1, last_page: 1, total: 0 }
+  } catch (err) {
+    console.error('Failed to fetch courses:', err)
+  } finally {
+    loading.value = false
   }
-  
-  return result
+}
+
+onMounted(() => {
+  fetchCategories()
+  fetchCourses()
+})
+
+// Search with debounce
+let searchTimeout
+watch(searchQuery, () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchCourses(1)
+  }, 500)
+})
+
+watch(selectedCategory, () => {
+  fetchCourses(1)
 })
 
 const openEnrollment = (course) => {
@@ -43,23 +80,44 @@ const openEnrollment = (course) => {
   isEnrollModalOpen.value = true
 }
 
-const confirmEnrollment = () => {
-  isEnrollModalOpen.value = false
+const confirmEnrollment = async () => {
+  if (!selectedCourse.value) return
   
-  if (selectedCourse.value.price === 'Gratis') {
-    // If free, skip payment gateway
-    setTimeout(() => isSuccessModalOpen.value = true, 300)
-  } else {
-    // Open Midtrans Gateway
-    setTimeout(() => {
-      isMidtransOpen.value = true
-    }, 300)
+  try {
+    const response = await checkout(selectedCourse.value.id)
+    isEnrollModalOpen.value = false
+    
+    if (response.data && response.data.snap_token) {
+      window.snap.pay(response.data.snap_token, {
+        onSuccess: async function(result) {
+          try {
+            // Synchronize with backend callback
+            await handleCallback({
+              order_id: result.order_id,
+              status_code: result.status_code,
+              gross_amount: result.gross_amount,
+              signature_key: result.signature_key,
+              transaction_status: result.transaction_status || 'settlement'
+            })
+            isSuccessModalOpen.value = true
+            fetchCourses(pagination.value.current_page)
+          } catch (callbackErr) {
+            console.error('Callback sync failed:', callbackErr)
+            // Even if callback fails, we show success if Snap was successful, 
+            // but log the error for debugging.
+            isSuccessModalOpen.value = true
+            fetchCourses(pagination.value.current_page)
+          }
+        }
+      })
+    } else {
+      isSuccessModalOpen.value = true
+      fetchCourses(pagination.value.current_page)
+    }
+  } catch (err) {
+    console.error('Checkout failed:', err)
+    alert(err.message || 'Gagal memproses pendaftaran.')
   }
-}
-
-const handlePaymentSuccess = () => {
-  isMidtransOpen.value = false
-  setTimeout(() => isSuccessModalOpen.value = true, 300)
 }
 </script>
 
@@ -79,38 +137,82 @@ const handlePaymentSuccess = () => {
         <Search class="w-5 h-5 text-gray-400 mx-3" />
         <input v-model="searchQuery" type="text" placeholder="Cari nama kursus..." class="w-full bg-transparent outline-none text-sm py-2 px-1" />
       </div>
-      
-      <!-- Category Pills -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar-hide">
-        <button 
-          v-for="cat in categories" 
-          :key="cat"
-          @click="selectedCategory = cat"
-          class="px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all"
-          :class="selectedCategory === cat ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+
+      <!-- Category Dropdown -->
+      <div class="relative min-w-[200px]">
+        <select 
+          v-model="selectedCategory"
+          class="w-full bg-white px-4 py-3 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] outline-none text-sm font-semibold text-gray-700 appearance-none cursor-pointer hover:border-indigo-200 transition-colors"
         >
-          {{ cat }}
-        </button>
+          <option v-for="cat in categories" :key="cat" :value="cat">
+            {{ cat === 'Semua' ? 'Semua Kategori' : cat }}
+          </option>
+        </select>
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+          <ChevronRight class="w-4 h-4 rotate-90" />
+        </div>
       </div>
     </div>
 
     <!-- Course Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <!-- Course Grid -->
+    <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div v-for="i in 8" :key="i" class="bg-gray-100 animate-pulse rounded-2xl h-[360px]"></div>
+    </div>
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <ExploreCourseCard 
-        v-for="course in filteredCourses" 
+        v-for="(course, index) in availableCourses" 
         :key="course.id"
-        :course="course"
+        :course="{
+          ...course,
+          category: course.category?.name || 'Uncategorized',
+          mentor: course.mentor?.name || 'Mentor',
+          image: course.thumbnail,
+          price: course.price > 0 ? `Rp ${Number(course.price).toLocaleString('id-ID')}` : 'Gratis',
+          lessons: course.lesson_count || 0,
+          hours: '12j 30m',
+          rating: 4.8,
+          students: 1250,
+          color: ['indigo', 'emerald', 'blue', 'rose', 'amber'][index % 5],
+          description: course.description || 'Tidak ada deskripsi tersedia.',
+          level: course.level || 'Beginner'
+        }"
         @enroll="openEnrollment"
       />
     </div>
 
     <!-- Empty State -->
-    <div v-if="filteredCourses.length === 0" class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
+    <div v-if="!loading && availableCourses.length === 0" class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
       <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100">
         <Search class="w-8 h-8 text-gray-400" />
       </div>
       <h3 class="text-lg font-bold text-gray-900 mb-1">Kursus Tidak Ditemukan</h3>
       <p class="text-gray-500 max-w-sm mx-auto">Kami tidak dapat menemukan kursus dengan filter dan kata kunci tersebut.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="pagination.last_page > 1" class="flex items-center justify-center gap-2 pt-4">
+      <button 
+        @click="fetchCourses(pagination.current_page - 1)"
+        :disabled="pagination.current_page === 1"
+        class="p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-600 hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-40"
+      >
+        <ChevronLeft class="w-5 h-5" />
+      </button>
+
+      <div class="px-6 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
+        <span class="text-sm font-bold text-indigo-600">{{ pagination.current_page }}</span>
+        <span class="mx-2 text-gray-300 text-xs">/</span>
+        <span class="text-xs text-gray-400 font-medium">{{ pagination.last_page }}</span>
+      </div>
+
+      <button 
+        @click="fetchCourses(pagination.current_page + 1)"
+        :disabled="pagination.current_page === pagination.last_page"
+        class="p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-600 hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-40"
+      >
+        <ChevronRight class="w-5 h-5" />
+      </button>
     </div>
 
     <!-- Enrollment Confirmation Modal -->
@@ -122,7 +224,7 @@ const handlePaymentSuccess = () => {
     >
       <div class="text-left mt-2 w-full" v-if="selectedCourse">
         <p class="text-sm text-gray-600 mb-4">Anda akan mendaftar ke kelas <strong>{{ selectedCourse.title }}</strong> bersama mentor <strong>{{ selectedCourse.mentor }}</strong>.</p>
-        
+
         <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between">
           <span class="text-sm font-semibold text-gray-500">Total Pembayaran</span>
           <span class="text-lg font-black text-indigo-600">{{ selectedCourse.price }}</span>
@@ -140,14 +242,14 @@ const handlePaymentSuccess = () => {
             @click="confirmEnrollment"
             class="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-sm"
           >
-            Ya, Daftar Kursus
+            Ya, Beli Kursus
           </button>
         </div>
       </div>
     </BaseModal>
 
     <!-- Success Output Modal -->
-    <BaseModal 
+    <BaseModal
       :is-open="isSuccessModalOpen"
       @close="isSuccessModalOpen = false"
       @confirm="isSuccessModalOpen = false"
