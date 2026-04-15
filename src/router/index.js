@@ -319,28 +319,20 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const authStore = useAuthStore();
 
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const requiredRole = to.matched.some((record) => record.meta.role)
-    ? to.matched.find((record) => record.meta.role).meta.role
-    : null;
-
-  // Prevent authenticated users from accessing login/register
   const isAuthPage = to.name === "login" || to.name === "register";
 
-  if (isAuthPage && authStore.isAuthenticated) {
-    // Redirect based on role
-    if (authStore.user?.role === "admin") {
-      return { name: "admin.dashboard" };
-    } else if (authStore.user?.role === "mentor") {
-      return { name: "mentor.dashboard" };
-    } else {
-      return { name: "student.dashboard" };
-    }
+  if (isAuthPage) {
+    return true;
   }
+
+  const requiresAuth = to.meta.requiresAuth;
+  const requiredRole = to.meta.role;
 
   if (requiresAuth && !authStore.isAuthenticated) {
     return { name: "login" };
-  } else if (requiredRole && authStore.user?.role !== requiredRole) {
+  }
+
+  if (requiredRole && authStore.user?.role !== requiredRole) {
     return { name: "Forbidden" };
   }
 });
