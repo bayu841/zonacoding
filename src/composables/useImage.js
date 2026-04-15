@@ -18,9 +18,12 @@ export const useImage = () => {
    * Generates image URL from env storage API.
    * If URL is relative path, prepend STORAGE_URL.
    * If URL is already full URL, return as is.
+   * Returns fallback image if URL is empty or invalid.
    */
   const getProxyUrl = (url) => {
-    if (!url) return null;
+    const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&q=80";
+    
+    if (!url) return FALLBACK_IMAGE;
 
     // If it's an emoji, return null to let component handle it
     if (isEmoji(url) && !url.includes("http")) return null;
@@ -37,7 +40,8 @@ export const useImage = () => {
       cleanPath = cleanPath.substring(8);
     }
 
-    return `${STORAGE_URL}/${cleanPath}`;
+    const fullUrl = `${STORAGE_URL}/${cleanPath}`;
+    return fullUrl || FALLBACK_IMAGE;
   };
 
   /**

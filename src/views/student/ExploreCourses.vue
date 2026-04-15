@@ -1,98 +1,102 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import BaseModal from '../../components/shared/BaseModal.vue'
-import ExploreCourseCard from '../../components/student/ExploreCourseCard.vue'
-import { getMentorActiveCourses } from '@/api/course'
-import { getCategories } from '@/api/category'
-import { checkout, handleCallback } from '@/api/transaction'
+import { ref, onMounted, watch } from "vue";
+import { Search, ChevronLeft, ChevronRight } from "lucide-vue-next";
+import BaseModal from "../../components/shared/BaseModal.vue";
+import ExploreCourseCard from "../../components/student/ExploreCourseCard.vue";
+import { getMentorActiveCourses } from "@/api/course";
+import { getCategories } from "@/api/category";
+import { checkout, handleCallback } from "@/api/transaction";
 
-const searchQuery = ref('')
-const selectedCategory = ref('Semua')
-const categories = ref(['Semua'])
-const availableCourses = ref([])
+const searchQuery = ref("");
+const selectedCategory = ref("Semua");
+const categories = ref(["Semua"]);
+const availableCourses = ref([]);
 const pagination = ref({
   current_page: 1,
   last_page: 1,
-  total: 0
-})
-const loading = ref(false)
+  total: 0,
+});
+const loading = ref(false);
 
-const isEnrollModalOpen = ref(false)
-const isSuccessModalOpen = ref(false)
-const selectedCourse = ref(null)
+const isEnrollModalOpen = ref(false);
+const isSuccessModalOpen = ref(false);
+const selectedCourse = ref(null);
 
 const fetchCategories = async () => {
   try {
-    const response = await getCategories()
-    const rawData = response.data?.data || response.data || []
+    const response = await getCategories();
+    const rawData = response.data?.data || response.data || [];
     if (Array.isArray(rawData)) {
-      categories.value = ['Semua', ...rawData.map(c => c.name)]
+      categories.value = ["Semua", ...rawData.map((c) => c.name)];
     }
   } catch (err) {
-    console.error('Failed to fetch categories:', err)
+    console.error("Failed to fetch categories:", err);
   }
-}
+};
 
 const fetchCourses = async (page = 1) => {
-  loading.value = true
+  loading.value = true;
   try {
     const params = {
       page,
-      search: searchQuery.value
+      search: searchQuery.value,
+    };
+
+    if (selectedCategory.value !== "Semua") {
+      params.category = selectedCategory.value;
     }
 
-    if (selectedCategory.value !== 'Semua') {
-      params.category = selectedCategory.value
-    }
-
-    const response = await getMentorActiveCourses(params)
-    const resultData = response.data || {}
-    availableCourses.value = resultData.data || []
-    pagination.value = resultData.pagination || { current_page: 1, last_page: 1, total: 0 }
+    const response = await getMentorActiveCourses(params);
+    const resultData = response.data || {};
+    availableCourses.value = resultData.data || [];
+    pagination.value = resultData.pagination || {
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    };
   } catch (err) {
-    console.error('Failed to fetch courses:', err)
+    console.error("Failed to fetch courses:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  fetchCategories()
-  fetchCourses()
-})
+  fetchCategories();
+  fetchCourses();
+});
 
 // Search with debounce
-let searchTimeout
+let searchTimeout;
 watch(searchQuery, () => {
-  clearTimeout(searchTimeout)
+  clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    fetchCourses(1)
-  }, 500)
-})
+    fetchCourses(1);
+  }, 500);
+});
 
 watch(selectedCategory, () => {
-  fetchCourses(1)
-})
+  fetchCourses(1);
+});
 
 const openEnrollment = (course) => {
-  selectedCourse.value = course
-  isEnrollModalOpen.value = true
-}
+  selectedCourse.value = course;
+  isEnrollModalOpen.value = true;
+};
 
 const confirmEnrollment = async () => {
-  if (!selectedCourse.value) return
+  if (!selectedCourse.value) return;
 
   try {
-    const response = await checkout(selectedCourse.value.id)
-    isEnrollModalOpen.value = false
+    const response = await checkout(selectedCourse.value.id);
+    isEnrollModalOpen.value = false;
 
     // The response has a 'data' field containing the snap_token
     const snapToken = response.data?.snap_token;
 
     if (snapToken) {
       window.snap.pay(snapToken, {
-        onSuccess: async function(result) {
+        onSuccess: async function (result) {
           try {
             // Synchronize with backend callback
             await handleCallback({
@@ -100,56 +104,68 @@ const confirmEnrollment = async () => {
               status_code: result.status_code,
               gross_amount: result.gross_amount,
               signature_key: result.signature_key,
-              transaction_status: result.transaction_status || 'settlement'
-            })
-            isSuccessModalOpen.value = true
-            fetchCourses(pagination.value.current_page)
+              transaction_status: result.transaction_status || "settlement",
+            });
+            isSuccessModalOpen.value = true;
+            fetchCourses(pagination.value.current_page);
           } catch (callbackErr) {
-            console.error('Callback sync failed:', callbackErr)
+            console.error("Callback sync failed:", callbackErr);
             // Even if callback fails, we show success if Snap was successful
-            isSuccessModalOpen.value = true
-            fetchCourses(pagination.value.current_page)
+            isSuccessModalOpen.value = true;
+            fetchCourses(pagination.value.current_page);
           }
         },
-        onPending: function(result) {
-          console.log('Payment pending:', result);
-          alert('Pembayaran tertunda. Silakan selesaikan pembayaran Anda.');
+        onPending: function (result) {
+          console.log("Payment pending:", result);
+          alert("Pembayaran tertunda. Silakan selesaikan pembayaran Anda.");
         },
-        onError: function(result) {
-          console.error('Payment error:', result);
-          alert('Terjadi kesalahan saat memproses pembayaran.');
+        onError: function (result) {
+          console.error("Payment error:", result);
+          alert("Terjadi kesalahan saat memproses pembayaran.");
         },
-        onClose: function() {
-          console.log('Payment popup closed');
-        }
-      })
+        onClose: function () {
+          console.log("Payment popup closed");
+        },
+      });
     } else {
       // In case of free course or already enrolled
-      isSuccessModalOpen.value = true
-      fetchCourses(pagination.value.current_page)
+      isSuccessModalOpen.value = true;
+      fetchCourses(pagination.value.current_page);
     }
   } catch (err) {
-    console.error('Checkout failed:', err)
-    alert(err.message || 'Gagal memproses pendaftaran.')
+    console.error("Checkout failed:", err);
+    alert(err.message || "Gagal memproses pendaftaran.");
   }
-}
+};
 </script>
 
 <template>
   <div class="space-y-6 max-w-7xl mx-auto pb-10">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h2 class="text-2xl font-bold text-gray-900">Eksplorasi Kursus</h2>
-        <p class="text-gray-500 text-sm mt-1">Temukan keahlian baru dan tingkatkan karirmu bersama mentor profesional.</p>
+        <p class="text-gray-500 text-sm mt-1">
+          Temukan keahlian baru dan tingkatkan karirmu bersama mentor
+          profesional.
+        </p>
       </div>
     </div>
 
     <!-- Filters & Search -->
     <div class="flex flex-col md:flex-row gap-4">
-      <div class="flex-1 bg-white p-2 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex items-center">
+      <div
+        class="flex-1 bg-white p-2 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex items-center"
+      >
         <Search class="w-5 h-5 text-gray-400 mx-3" />
-        <input v-model="searchQuery" type="text" placeholder="Cari nama kursus..." class="w-full bg-transparent outline-none text-sm py-2 px-1" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Cari nama kursus..."
+          class="w-full bg-transparent outline-none text-sm py-2 px-1"
+        />
       </div>
 
       <!-- Category Dropdown -->
@@ -159,10 +175,12 @@ const confirmEnrollment = async () => {
           class="w-full bg-white px-4 py-3 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] outline-none text-sm font-semibold text-gray-700 appearance-none cursor-pointer hover:border-indigo-200 transition-colors"
         >
           <option v-for="cat in categories" :key="cat" :value="cat">
-            {{ cat === 'Semua' ? 'Semua Kategori' : cat }}
+            {{ cat === "Semua" ? "Semua Kategori" : cat }}
           </option>
         </select>
-        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+        <div
+          class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
+        >
           <ChevronRight class="w-4 h-4 rotate-90" />
         </div>
       </div>
@@ -170,10 +188,20 @@ const confirmEnrollment = async () => {
 
     <!-- Course Grid -->
     <!-- Course Grid -->
-    <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div v-for="i in 8" :key="i" class="bg-gray-100 animate-pulse rounded-2xl h-[360px]"></div>
+    <div
+      v-if="loading"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
+      <div
+        v-for="i in 8"
+        :key="i"
+        class="bg-gray-100 animate-pulse rounded-2xl h-[360px]"
+      ></div>
     </div>
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div
+      v-else
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
       <ExploreCourseCard
         v-for="(course, index) in availableCourses"
         :key="course.id"
@@ -181,31 +209,48 @@ const confirmEnrollment = async () => {
           ...course,
           category: course.category?.name || 'Uncategorized',
           mentor: course.mentor?.name || 'Mentor',
-          image: course.thumbnail,
-          price: course.price > 0 ? `Rp ${Number(course.price).toLocaleString('id-ID')}` : 'Gratis',
+          image:
+            course.thumbnail ||
+            'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&q=80',
+          price:
+            course.price > 0
+              ? `Rp ${Number(course.price).toLocaleString('id-ID')}`
+              : 'Gratis',
           lessons: course.lesson_count || 0,
           hours: '12j 30m',
           rating: 4.8,
           students: 1250,
           color: ['indigo', 'emerald', 'blue', 'rose', 'amber'][index % 5],
           description: course.description || 'Tidak ada deskripsi tersedia.',
-          level: course.level || 'Beginner'
+          level: course.level || 'Beginner',
         }"
         @enroll="openEnrollment"
       />
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && availableCourses.length === 0" class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-      <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100">
+    <div
+      v-if="!loading && availableCourses.length === 0"
+      class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm"
+    >
+      <div
+        class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100"
+      >
         <Search class="w-8 h-8 text-gray-400" />
       </div>
-      <h3 class="text-lg font-bold text-gray-900 mb-1">Kursus Tidak Ditemukan</h3>
-      <p class="text-gray-500 max-w-sm mx-auto">Kami tidak dapat menemukan kursus dengan filter dan kata kunci tersebut.</p>
+      <h3 class="text-lg font-bold text-gray-900 mb-1">
+        Kursus Tidak Ditemukan
+      </h3>
+      <p class="text-gray-500 max-w-sm mx-auto">
+        Kami tidak dapat menemukan kursus dengan filter dan kata kunci tersebut.
+      </p>
     </div>
 
     <!-- Pagination -->
-    <div v-if="pagination.last_page > 1" class="flex items-center justify-center gap-2 pt-4">
+    <div
+      v-if="pagination.last_page > 1"
+      class="flex items-center justify-center gap-2 pt-4"
+    >
       <button
         @click="fetchCourses(pagination.current_page - 1)"
         :disabled="pagination.current_page === 1"
@@ -214,10 +259,16 @@ const confirmEnrollment = async () => {
         <ChevronLeft class="w-5 h-5" />
       </button>
 
-      <div class="px-6 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
-        <span class="text-sm font-bold text-indigo-600">{{ pagination.current_page }}</span>
+      <div
+        class="px-6 py-2 bg-white border border-gray-100 rounded-xl shadow-sm"
+      >
+        <span class="text-sm font-bold text-indigo-600">{{
+          pagination.current_page
+        }}</span>
         <span class="mx-2 text-gray-300 text-xs">/</span>
-        <span class="text-xs text-gray-400 font-medium">{{ pagination.last_page }}</span>
+        <span class="text-xs text-gray-400 font-medium">{{
+          pagination.last_page
+        }}</span>
       </div>
 
       <button
@@ -237,13 +288,27 @@ const confirmEnrollment = async () => {
       type="info"
     >
       <div class="text-left mt-2 w-full" v-if="selectedCourse">
-        <p class="text-sm text-gray-600 mb-4">Anda akan mendaftar ke kelas <strong>{{ selectedCourse.title }}</strong> bersama mentor <strong>{{ selectedCourse.mentor }}</strong>.</p>
+        <p class="text-sm text-gray-600 mb-4">
+          Anda akan mendaftar ke kelas
+          <strong>{{ selectedCourse.title }}</strong> bersama mentor
+          <strong>{{ selectedCourse.mentor }}</strong
+          >.
+        </p>
 
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between">
-          <span class="text-sm font-semibold text-gray-500">Total Pembayaran</span>
-          <span class="text-lg font-black text-indigo-600">{{ selectedCourse.price }}</span>
+        <div
+          class="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between"
+        >
+          <span class="text-sm font-semibold text-gray-500"
+            >Total Pembayaran</span
+          >
+          <span class="text-lg font-black text-indigo-600">{{
+            selectedCourse.price
+          }}</span>
         </div>
-        <p class="text-xs text-gray-400 mt-2 mb-8 italic">*Jika kursus berbayar, Anda akan dialihkan ke gerbang pembayaran (Payment Gateway) setelah konfirmasi.</p>
+        <p class="text-xs text-gray-400 mt-2 mb-8 italic">
+          *Jika kursus berbayar, Anda akan dialihkan ke gerbang pembayaran
+          (Payment Gateway) setelah konfirmasi.
+        </p>
 
         <div class="flex space-x-3 w-full">
           <button
