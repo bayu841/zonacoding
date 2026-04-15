@@ -41,7 +41,7 @@ const fetchCourses = async (page = 1) => {
       page,
       search: searchQuery.value
     }
-    
+
     if (selectedCategory.value !== 'Semua') {
       params.category = selectedCategory.value
     }
@@ -82,13 +82,16 @@ const openEnrollment = (course) => {
 
 const confirmEnrollment = async () => {
   if (!selectedCourse.value) return
-  
+
   try {
     const response = await checkout(selectedCourse.value.id)
     isEnrollModalOpen.value = false
-    
-    if (response.data && response.data.snap_token) {
-      window.snap.pay(response.data.snap_token, {
+
+    // The response has a 'data' field containing the snap_token
+    const snapToken = response.data?.snap_token;
+
+    if (snapToken) {
+      window.snap.pay(snapToken, {
         onSuccess: async function(result) {
           try {
             // Synchronize with backend callback
@@ -103,14 +106,25 @@ const confirmEnrollment = async () => {
             fetchCourses(pagination.value.current_page)
           } catch (callbackErr) {
             console.error('Callback sync failed:', callbackErr)
-            // Even if callback fails, we show success if Snap was successful, 
-            // but log the error for debugging.
+            // Even if callback fails, we show success if Snap was successful
             isSuccessModalOpen.value = true
             fetchCourses(pagination.value.current_page)
           }
+        },
+        onPending: function(result) {
+          console.log('Payment pending:', result);
+          alert('Pembayaran tertunda. Silakan selesaikan pembayaran Anda.');
+        },
+        onError: function(result) {
+          console.error('Payment error:', result);
+          alert('Terjadi kesalahan saat memproses pembayaran.');
+        },
+        onClose: function() {
+          console.log('Payment popup closed');
         }
       })
     } else {
+      // In case of free course or already enrolled
       isSuccessModalOpen.value = true
       fetchCourses(pagination.value.current_page)
     }
@@ -140,7 +154,7 @@ const confirmEnrollment = async () => {
 
       <!-- Category Dropdown -->
       <div class="relative min-w-[200px]">
-        <select 
+        <select
           v-model="selectedCategory"
           class="w-full bg-white px-4 py-3 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] outline-none text-sm font-semibold text-gray-700 appearance-none cursor-pointer hover:border-indigo-200 transition-colors"
         >
@@ -160,8 +174,8 @@ const confirmEnrollment = async () => {
       <div v-for="i in 8" :key="i" class="bg-gray-100 animate-pulse rounded-2xl h-[360px]"></div>
     </div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <ExploreCourseCard 
-        v-for="(course, index) in availableCourses" 
+      <ExploreCourseCard
+        v-for="(course, index) in availableCourses"
         :key="course.id"
         :course="{
           ...course,
@@ -192,7 +206,7 @@ const confirmEnrollment = async () => {
 
     <!-- Pagination -->
     <div v-if="pagination.last_page > 1" class="flex items-center justify-center gap-2 pt-4">
-      <button 
+      <button
         @click="fetchCourses(pagination.current_page - 1)"
         :disabled="pagination.current_page === 1"
         class="p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-600 hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-40"
@@ -206,7 +220,7 @@ const confirmEnrollment = async () => {
         <span class="text-xs text-gray-400 font-medium">{{ pagination.last_page }}</span>
       </div>
 
-      <button 
+      <button
         @click="fetchCourses(pagination.current_page + 1)"
         :disabled="pagination.current_page === pagination.last_page"
         class="p-2.5 bg-white border border-gray-100 rounded-xl shadow-sm text-gray-600 hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-40"
@@ -257,15 +271,6 @@ const confirmEnrollment = async () => {
       message="Selamat belajar! Kursus telah ditambahkan ke menu 'Kursus Saya'. Selesaikan materi dan raih sertifikatmu."
       type="success"
       confirmText="Lanjut Belajar"
-    />
-
-    <!-- Midtrans Payment Simulator -->
-    <MidtransSnapMock
-      :is-open="isMidtransOpen"
-      :amount="selectedCourse ? selectedCourse.price : 'Rp 0'"
-      :order-id="'MDTRNS-' + Math.floor(Math.random() * 100000)"
-      @close="isMidtransOpen = false"
-      @success="handlePaymentSuccess"
     />
   </div>
 </template>

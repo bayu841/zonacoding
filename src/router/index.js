@@ -159,7 +159,8 @@ const routes = [
       {
         path: "withdrawals",
         name: "admin.withdrawals.list",
-        component: () => import("../views/admin/transactions/WithdrawalList.vue"),
+        component: () =>
+          import("../views/admin/transactions/WithdrawalList.vue"),
       },
 
       // System Settings
@@ -281,23 +282,23 @@ const routes = [
     path: "/403",
     name: "Forbidden",
     component: ErrorView,
-    props: { code: 403 }
+    props: { code: 403 },
   },
   {
     path: "/404",
     name: "NotFound",
     component: ErrorView,
-    props: { code: 404 }
+    props: { code: 404 },
   },
   {
     path: "/500",
     name: "ServerError",
     component: ErrorView,
-    props: { code: 500 }
+    props: { code: 500 },
   },
   {
     path: "/:pathMatch(.*)*",
-    redirect: "/404"
+    redirect: "/404",
   },
 ];
 
@@ -308,10 +309,10 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const requiredRole = to.matched.some(record => record.meta.role) 
-    ? to.matched.find(record => record.meta.role).meta.role 
+
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiredRole = to.matched.some((record) => record.meta.role)
+    ? to.matched.find((record) => record.meta.role).meta.role
     : null;
 
   // Prevent authenticated users from accessing login/register
@@ -339,4 +340,3 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
-
