@@ -16,7 +16,22 @@ const fetchCertificates = async () => {
   loading.value = true;
   try {
     const response = await getMyCertificates();
-    certificates.value = response.data || [];
+    // Response structure: { status, message, code, data: { certificates: [...] } }
+    const rawCertificates = response.data?.certificates || [];
+
+    // Map API fields to component structure
+    certificates.value = rawCertificates.map(cert => ({
+      id: cert.id,
+      title: cert.course_title,
+      issueDate: cert.issued_at_formatted,
+      credentialID: cert.certificate_number,
+      studentName: cert.student_name,
+      mentorName: cert.mentor_name,
+      categoryName: cert.category_name,
+      pdfLink: cert.pdf_url || '#'
+    }));
+
+    console.log("Certificates fetched:", certificates.value);
   } catch (err) {
     console.error("Failed to fetch certificates:", err);
     showAlert("error", "Gagal memuat sertifikat");
@@ -28,14 +43,6 @@ const fetchCertificates = async () => {
 const openViewer = (cert) => {
   selectedCert.value = cert;
   isDownloadModalOpen.value = true;
-};
-
-const simulateDownload = () => {
-  showAlert(
-    "Download Dimulai",
-    `Sertifikat "${selectedCert.value.title}" sedang disiapkan.`,
-    "success",
-  );
 };
 
 onMounted(() => {
@@ -104,7 +111,6 @@ onMounted(() => {
       :is-open="isDownloadModalOpen"
       :cert="selectedCert"
       @close="isDownloadModalOpen = false"
-      @download="simulateDownload"
     />
   </div>
 </template>

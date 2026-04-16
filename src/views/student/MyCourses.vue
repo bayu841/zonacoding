@@ -49,7 +49,16 @@ onMounted(() => {
 });
 
 const enterLearningRoom = (course) => {
-  router.push("/student/courses/" + course.course_id + "/learn");
+  // Get last viewed lesson from localStorage
+  const lastLessonKey = `last_lesson_${course.course_id}`;
+  const lastLessonId = localStorage.getItem(lastLessonKey);
+  
+  // Navigate to learning room with optional last lesson ID
+  let url = "/student/courses/" + course.course_id + "/learn";
+  if (lastLessonId) {
+    url += `?lessonId=${lastLessonId}`;
+  }
+  router.push(url);
 };
 </script>
 

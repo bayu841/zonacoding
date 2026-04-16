@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 import {
   LayoutDashboard,
   Users,
@@ -17,9 +17,9 @@ import {
   UserCheck,
 } from "lucide-vue-next";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
 // State untuk sidebar desktop (expanded/collapsed)
 const isSidebarOpen = ref(true);
@@ -47,12 +47,12 @@ const navigationGroups = [
   {
     title: "Sistem",
     items: [
-      { name: 'Transaksi', to: '/admin/transactions', icon: Receipt },
-      { name: 'Penarikan Mentor', to: '/admin/withdrawals', icon: Receipt },
-      { name: 'Pengaturan', to: '/admin/settings', icon: Settings }
-    ]
-  }
-]
+      { name: "Transaksi", to: "/admin/transactions", icon: Receipt },
+      { name: "Penarikan Mentor", to: "/admin/withdrawals", icon: Receipt },
+      { name: "Pengaturan", to: "/admin/settings", icon: Settings },
+    ],
+  },
+];
 
 const showDropdown = ref(false);
 
@@ -69,11 +69,11 @@ const toggleDropdown = () => {
 };
 
 const handleLogout = async () => {
-  showDropdown.value = false
-  closeMobileDrawer()
-  await authStore.logout()
-  router.push('/')
-}
+  showDropdown.value = false;
+  closeMobileDrawer();
+  await authStore.logout();
+  router.push("/login");
+};
 
 // Helper untuk mengecek apakah route saat ini aktif (termasuk nested)
 const isActiveRoute = (item) => {
@@ -236,7 +236,7 @@ const isActiveRoute = (item) => {
             <div
               class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-semibold text-sm shadow-[0_2px_8px_rgba(59,130,246,0.2)] ring-2 ring-white/80 group-hover:ring-blue-200 transition-all"
             >
-              {{ authStore.user?.name?.charAt(0).toUpperCase() || 'A' }}
+              {{ authStore.user?.name?.charAt(0).toUpperCase() || "A" }}
             </div>
           </button>
 

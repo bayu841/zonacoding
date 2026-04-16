@@ -53,11 +53,15 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async logout() {
+      // Call logout API first (with token still available)
       try {
         await logoutApi();
       } catch (error) {
+        // Auth API already handles 401/422 gracefully
+        // If error still reaches here, log it but continue logout
         console.error("Logout error:", error);
       } finally {
+        // Clear auth AFTER API call
         this.clearAuth();
         
         // Clear related stores

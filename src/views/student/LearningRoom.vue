@@ -27,12 +27,11 @@ import {
 import BaseModal from "../../components/shared/BaseModal.vue";
 import { useAlert } from "../../composables/useAlert";
 import {
-  getLessons,
   getTasks,
-  getQuizzes,
   getQuizDetail,
   markLessonComplete,
   updateLessonProgress,
+  getCourseLessonsWithProgress,
 } from "@/api/course";
 
 // Modular Components
@@ -61,30 +60,45 @@ const currentLessonId = ref(null);
 const fetchCourseContent = async () => {
   loading.value = true;
   try {
-    // Fetch lessons
-    const lessonsResponse = await getLessons(courseId.value);
-    const lessonsData = lessonsResponse.data?.data || [];
+    // Fetch all lessons, quizzes, and progress in single API call
+    const contentResponse = await getCourseLessonsWithProgress(courseId.value);
+    const {
+      lessons: lessonsData,
+      embeddedQuizzes,
+      unrelatedQuizzes,
+      courseProgress: courseProgressPercentage,
+      completedLessons,
+    } = contentResponse.data;
 
-    // Fetch tasks
+    // Fetch tasks separately
     const tasksResponse = await getTasks(courseId.value);
     const tasksData = tasksResponse.data?.tasks || [];
 
-    // Fetch quizzes
-    const quizzesResponse = await getQuizzes(courseId.value);
-    const quizzesData = quizzesResponse.data || [];
+    // Combine all quizzes
+    const allQuizzes = [...embeddedQuizzes, ...unrelatedQuizzes];
 
     console.log("Lessons:", lessonsData);
     console.log("Tasks:", tasksData);
-    console.log("Quizzes:", quizzesData);
+    console.log("All Quizzes (embedded + unrelated):", allQuizzes);
+    console.log("Completed Lessons:", completedLessons);
+    console.log("Course Progress:", courseProgressPercentage + "%");
 
     // Transform data ke struktur container
     lessons.value = lessonsData;
     tasks.value = tasksData;
-    quizzes.value = quizzesData;
+    quizzes.value = allQuizzes;
+    finishedLessons.value = completedLessons;
+    courseProgress.value = courseProgressPercentage;
 
-    // Set current lesson ke lesson pertama setelah syllabus computed
-    if (lessonsData.length > 0) {
+    // Set current lesson
+    // Priority: route query param > localStorage > first lesson
+    const queryLessonId = route.query.lessonId;
+    if (queryLessonId) {
+      currentLessonId.value = queryLessonId;
+      console.log("Set to query lesson:", queryLessonId);
+    } else if (lessonsData.length > 0) {
       currentLessonId.value = lessonsData[0].id;
+      console.log("Set to first lesson:", lessonsData[0].id);
     }
   } catch (err) {
     console.error("Failed to fetch course content:", err);
@@ -99,7 +113,8 @@ onMounted(() => {
 });
 
 // 1. Progress State
-const finishedLessons = ref(["l1", "l2"]); // Already finished
+const finishedLessons = ref([]);
+const courseProgress = ref(0);
 
 // 2. Assignment State
 const assignmentLink = ref("");
@@ -231,30 +246,71 @@ const selectLesson = async (id) => {
     }
   }
 
-  // If it's a quiz, fetch detail quiz first
+  // If it's a quiz, fetch detail quiz first (only if questions not already embedded)
   if (selectedItem && selectedItem.type === "quiz") {
-    try {
-      quizLoading.value = true;
-      const quizDetailResponse = await getQuizDetail(id);
-      const quizDetail = quizDetailResponse.data || quizDetailResponse;
+    // Check if quiz already has questions embedded
+    if (!selectedItem.quizData?.questions || selectedItem.quizData.questions.length === 0) {
+      try {
+        quizLoading.value = true;
+        console.log("Fetching quiz detail for ID:", id);
+        
+        const quizDetailResponse = await getQuizDetail(id);
+        const quizDetail = quizDetailResponse.data || quizDetailResponse;
+        
+        // Transform questions to match component expectations
+        const transformedQuestions = (quizDetail.questions || quizDetail.data?.questions || []).map((q, idx) => {
+          // Extract text options from option objects
+          const textOptions = q.options?.map((opt) => {
+            if (typeof opt === 'string') return opt;
+            if (opt.option_text) return opt.option_text;
+            return String(opt);
+          }) || [];
 
-      // Update quizData with full detail including questions
-      selectedItem.quizData = {
-        ...selectedItem.quizData,
-        ...quizDetail,
-        // Store questions for QuizLesson component
-        questions: quizDetail.questions || [],
-      };
-    } catch (err) {
-      console.error("Failed to fetch quiz detail:", err);
-      showAlert("error", "Gagal memuat detail ujian");
-      return;
-    } finally {
-      quizLoading.value = false;
+          return {
+            ...q,
+            // Transform options array to strings
+            options: textOptions,
+            // Map correct answer - use correct_answer_id or generate from backend if available
+            correctIndex: q.correct_answer !== undefined 
+              ? q.correct_answer 
+              : (q.correct_answer_id ? q.options?.findIndex(o => o.id === q.correct_answer_id) : 0),
+            // Ensure text field exists (quiz API uses 'question', component expects 'text')
+            text: q.text || q.question || q.question_text || "",
+            // Type defaults to multiple-choice
+            type: q.type?.toLowerCase() === 'matching' ? 'matching' : 'multiple-choice',
+          };
+        });
+        
+        console.log("Quiz detail fetched and transformed:", transformedQuestions);
+
+        // Find and update the quiz in quizzes.value array directly
+        const quizIndex = quizzes.value.findIndex((q) => q.id === id);
+        if (quizIndex !== -1) {
+          quizzes.value[quizIndex] = {
+            ...quizzes.value[quizIndex],
+            ...quizDetail,
+            // Store questions for QuizLesson component
+            questions: transformedQuestions,
+          };
+          console.log("Quiz updated with transformed questions:", quizzes.value[quizIndex].questions.length);
+        }
+      } catch (err) {
+        console.error("Failed to fetch quiz detail:", err);
+        showAlert("error", "Gagal memuat detail ujian");
+        return;
+      } finally {
+        quizLoading.value = false;
+      }
+    } else {
+      console.log("Quiz already has questions, skipping detail fetch");
     }
   }
 
   currentLessonId.value = id;
+  
+  // Save to localStorage untuk resume next time
+  localStorage.setItem(`last_lesson_${courseId.value}`, id);
+  console.log("Saved last lesson:", id);
 };
 
 const markAsComplete = async () => {
@@ -262,8 +318,13 @@ const markAsComplete = async () => {
     // Call API to mark lesson as complete
     await markLessonComplete(currentLessonId.value);
 
-    // Call API to update progress
-    await updateLessonProgress(currentLessonId.value);
+    // Get progress from lesson object (no API call needed, embedded in lesson)
+    const currentLesson = lessons.value.find(
+      (l) => l.id === currentLessonId.value
+    );
+    if (currentLesson) {
+      updateLessonProgress(currentLesson);
+    }
 
     // Update local state
     if (!finishedLessons.value.includes(currentLessonId.value)) {
@@ -274,6 +335,8 @@ const markAsComplete = async () => {
     const idx = flatLessons.findIndex((l) => l.id === currentLessonId.value);
     if (idx < flatLessons.length - 1) {
       currentLessonId.value = flatLessons[idx + 1].id;
+      // Save to localStorage
+      localStorage.setItem(`last_lesson_${courseId.value}`, currentLessonId.value);
     }
 
     showAlert("success", "Materi berhasil diselesaikan!");
@@ -409,8 +472,19 @@ const articleContent = `
             @view-certificates="router.push('/student/certificates')"
           />
 
+          <!-- Quiz Loading State -->
+          <div
+            v-if="currentLesson?.type === 'quiz' && quizLoading"
+            class="bg-white min-h-[600px] rounded-3xl flex items-center justify-center"
+          >
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+              <p class="text-gray-600 font-medium">Memuat soal ujian...</p>
+            </div>
+          </div>
+
           <QuizLesson
-            v-else-if="currentLesson?.type === 'quiz'"
+            v-else-if="currentLesson?.type === 'quiz' && !quizLoading"
             :lesson="currentLesson"
             @complete="markAsComplete"
           />
