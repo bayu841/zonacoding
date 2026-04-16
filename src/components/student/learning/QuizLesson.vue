@@ -240,10 +240,6 @@ onMounted(() => {
         <svg v-if="currentQuestion && currentQuestion.type === 'matching'" class="absolute top-0 left-0 w-full pointer-events-none z-0 overflow-visible" 
              style="height: 2000px;">
           <defs>
-             <filter id="ropeShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-             </filter>
              <linearGradient id="ropeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
@@ -258,7 +254,6 @@ onMounted(() => {
               stroke-linecap="round" 
               stroke-dasharray="10,8"
               class="animate-dash"
-              filter="url(#ropeShadow)"
             />
             <circle :cx="line.x1" :cy="line.y1" r="7" fill="#4f46e5" stroke="white" stroke-width="2" />
             <circle :cx="line.x2" :cy="line.y2" r="7" fill="#10b981" stroke="white" stroke-width="2" />
